@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.operate.dao.OperateArticleDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateArticleBO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="ARTICLE_ID" property="articleId" jdbcType="VARCHAR" />
+    <result column="ARTICLE_TITLE" property="articleTitle" jdbcType="VARCHAR" />
+    <result column="TYPE_ID" property="typeId" jdbcType="DECIMAL" />
+    <result column="TYPE_NAME" property="typeName" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="INTEGER" />
+    <result column="WEB" property="web" jdbcType="TINYINT" />
+    <result column="WAP" property="wap" jdbcType="TINYINT" />
+    <result column="ANDROID" property="android" jdbcType="TINYINT" />
+    <result column="IOS" property="ios" jdbcType="TINYINT" />
+    <result column="ORDER_ID" property="orderId" jdbcType="INTEGER" />
+    <result column="ARTICLE_FROM" property="articleFrom" jdbcType="VARCHAR" />
+    <result column="FROM_URL" property="fromUrl" jdbcType="VARCHAR" />
+    <result column="ARTICLE_URL" property="articleUrl" jdbcType="VARCHAR" />
+    <result column="ARTICLE_IMG" property="articleImg" jdbcType="VARCHAR" />
+    <result column="ARTICLE_IMG_CREATE_TIME" property="articleImgCreateTime" jdbcType="TIMESTAMP" />
+    <result column="ARTICLE_SUMMARY" property="articleSummary" jdbcType="VARCHAR" />
+    <result column="ARTICLE_LABEL" property="articleLabel" jdbcType="VARCHAR" />
+    <result column="CLICK" property="click" jdbcType="DECIMAL" />
+    <result column="CREATE_BY" property="createBy" jdbcType="VARCHAR" />
+    <result column="MODIFY_BY" property="modifyBy" jdbcType="VARCHAR" />
+    <result column="AUDIT_BY" property="auditBy" jdbcType="VARCHAR" />
+    <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="RELEASE_TIME" property="releaseTime" jdbcType="TIMESTAMP" />
+    <result column="AUDIT_TIME" property="auditTime" jdbcType="TIMESTAMP" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="MODIFY_TIME" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="ARTICLE_CONTENT" property="articleContent" jdbcType="CLOB" />
+    <result column="TYPE_CODE" property="typeCode" jdbcType="VARCHAR" />
+    <result column="CREATOR_ID" property="creatorId" jdbcType="DECIMAL" />
+    <collection property="articleTops" ofType="com.hhly.skeleton.cms.operatemgr.bo.OperateArticleTopBO">
+	    <id column="TOP_ID" property="id"/>
+    	<result column="TOP_TYPE_ID" jdbcType="DECIMAL" property="typeId" />
+	    <result column="TOP_ARTICLE_ID" jdbcType="DECIMAL" property="articleId" />
+	    <result column="TITLE" jdbcType="VARCHAR" property="title" />
+	    <result column="COLOR" jdbcType="VARCHAR" property="color" />
+	    <result column="UPTIME" jdbcType="TIMESTAMP" property="uptime" />
+	    <result column="DOWNTIME" jdbcType="TIMESTAMP" property="downtime" />
+	    <result column="ISTOP" jdbcType="TINYINT" property="isTop" />
+  	</collection>
+  </resultMap>
+  
+  <resultMap id="LottBaseResultMap" type="com.hhly.skeleton.lotto.base.operate.bo.OperateArticleBaseBO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="ARTICLE_TITLE" property="articleTitle" jdbcType="VARCHAR" />    
+    <result column="TYPE_NAME" property="typeName" jdbcType="VARCHAR" />
+    <result column="ARTICLE_FROM" property="articleFrom" jdbcType="VARCHAR" />
+    <result column="ARTICLE_URL" property="articleUrl" jdbcType="VARCHAR" />
+    <result column="ARTICLE_LABEL" property="articleLabel" jdbcType="VARCHAR" />    
+    <result column="typeTopCode" property="typeTopCode" jdbcType="VARCHAR" />  
+	<result column="typeTopName" property="typeTopName" jdbcType="VARCHAR" />
+	<result column="TITLE" property="topTitle" jdbcType="VARCHAR" />
+    <result column="COLOR" property="color" jdbcType="VARCHAR" />  
+    <result column="IDENTIFIERS" property="identifiers" jdbcType="VARCHAR" /> 
+    <result column="RELEASE_TIME" property="releaseTime" jdbcType="TIMESTAMP" />
+    <result column="TYPE_CODE" property="typeCode" jdbcType="VARCHAR" />           
+  </resultMap>
+  <resultMap id="LottResultMap" type="com.hhly.skeleton.lotto.base.operate.bo.OperateArticleLottBO" extends="LottBaseResultMap" >
+    <result column="ARTICLE_IMG" property="articleImg" jdbcType="VARCHAR" />
+    <result column="ARTICLE_SUMMARY" property="articleSummary" jdbcType="VARCHAR" />
+    <result column="CREATE_BY" property="createBy" jdbcType="VARCHAR" />    
+    <result column="isVideo" property="isVideo" jdbcType="DECIMAL" /> 
+    <result column="ISTOP" property="isTop" jdbcType="DECIMAL" />    
+  </resultMap>
+  <resultMap id="UserResultMap" type="com.hhly.skeleton.lotto.base.operate.bo.OperateArticleLottBO" extends="LottResultMap" >
+   <result column="creator_id" property="userId" jdbcType="VARCHAR" />  
+  </resultMap>
+  <resultMap id="LottDetailResultMap" type="com.hhly.skeleton.lotto.base.operate.bo.OperateArticleLottBO" extends="LottResultMap" >
+    <result column="ARTICLE_CONTENT" property="articleContent" jdbcType="VARCHAR" />
+    <result column="CLICK" property="click" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ArticleResultMap" type="com.hhly.skeleton.lotto.base.operate.bo.OperateArticleLottBO">
+    <result column="TYPE_CODE" property="typeCode" jdbcType="VARCHAR" />  
+    <result column="ARTICLE_TITLE" property="articleTitle" jdbcType="VARCHAR" />    
+    <result column="TYPE_NAME" property="typeName" jdbcType="VARCHAR" />
+    <result column="ARTICLE_FROM" property="articleFrom" jdbcType="VARCHAR" />
+    <result column="ARTICLE_URL" property="articleUrl" jdbcType="VARCHAR" />
+    <result column="ARTICLE_LABEL" property="articleLabel" jdbcType="VARCHAR" /> 
+    <result column="ARTICLE_IMG" property="articleImg" jdbcType="VARCHAR" />
+    <result column="ARTICLE_SUMMARY" property="articleSummary" jdbcType="VARCHAR" />
+    <result column="CREATE_BY" property="createBy" jdbcType="VARCHAR" /> 
+    <result column="RELEASE_TIME" property="releaseTime" jdbcType="TIMESTAMP" /> 
+    <result column="CLICK" property="click" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, ARTICLE_ID, ARTICLE_TITLE, TYPE_ID, TYPE_NAME, STATUS, ORDER_ID, ARTICLE_FROM,FROM_URL,
+    ARTICLE_URL, ARTICLE_IMG, ARTICLE_IMG_CREATE_TIME, ARTICLE_SUMMARY, 
+    ARTICLE_LABEL, CLICK, CREATE_BY, MODIFY_BY, AUDIT_BY, UPDATE_TIME, RELEASE_TIME, 
+    AUDIT_TIME, CREATE_TIME
+  </sql>
+  
+  <sql id="Blob_Column_List" >
+    ARTICLE_CONTENT
+  </sql>
+  
+  <sql id="Page_Condition">
+  	 <if test="startRow != null and pageSize != null">
+		limit #{startRow} ,#{pageSize}
+	 </if>
+  </sql>
+
+   
+   <sql id="Query_Condition">
+	  	<where>
+			<if test="articleTitle != null and articleTitle != ''">
+				and oa.ARTICLE_TITLE like CONCAT('%',#{articleTitle},'%')
+	  		</if>
+			<if test="status != null">
+				and status = #{status}
+	  		</if>
+	  		<!-- 要按用户id查询
+			<if test="createBy != null and createBy !=''">
+				and CREATE_BY like CONCAT('%',#{createBy},'%')
+	  		</if>
+	  		 -->
+  		 	<if test="creatorId != null">
+				and CREATOR_ID = #{creatorId}
+	  		</if>
+	  		<if test="searchTimeType != null and startTime != null and endTime != null">
+				<choose>
+					<when test="searchTimeType == 1">
+						<![CDATA[ and CREATE_TIME >= #{startTime} and CREATE_TIME <= #{endTime}]]>
+					</when>
+					<when test="searchTimeType == 2">
+						<![CDATA[ and RELEASE_TIME >= #{startTime} and RELEASE_TIME <= #{endTime}]]>
+					</when>
+					<when test="searchTimeType == 3">
+						<![CDATA[ and MODIFY_TIME >= #{startTime} and MODIFY_TIME <= #{endTime}]]>
+					</when>
+					<when test="searchTimeType == 4">
+						<![CDATA[ and AUDIT_TIME >= #{startTime} and AUDIT_TIME <= #{endTime}]]>
+					</when>
+				</choose>
+			</if>
+			<if test="typeId != null">
+				and oat.TYPE_ID = #{typeId}
+	  		</if>
+		</where>
+  </sql>
+  
+  <sql id="Table">
+  	OPERATE_ARTICLE
+  </sql>
+  
+  <sql id="Table_Top">
+  	OPERATE_ARTICLE_TOP
+  </sql>
+  
+  <select id="findMaxArticleId" resultType="string">
+  	select max(ARTICLE_ID) from OPERATE_ARTICLE where ARTICLE_ID like CONCAT( ${articleIdLike},'%')
+  </select>
+  
+   <sql id="Lott_Column_List" >
+   		<include refid="Lott_Base_Column_List"/> , ARTICLE_IMG, ARTICLE_SUMMARY,
+	     CLICK
+   </sql>
+   <sql id="Lott_Base_Column_List" >
+	   ID, ARTICLE_TITLE, title, TYPE_NAME,ORDER_ID, ARTICLE_FROM, RELEASE_TIME,CREATE_BY,
+	    ARTICLE_URL, ARTICLE_LABEL,  COLOR,typeTopCode,typeTopName,IDENTIFIERS,isVideo, case when istop=1 then  case when now()>DOWNTIME then 0 else 1 end  else 0 end AS ISTOP ,  TYPE_CODE
+   </sql>
+   <!-- 连接基本表，置顶表，栏目表   置顶表关联栏目表-->
+   <sql id="JoinTableSql">
+  	(select OPERATE_ARTICLE.creator_id,OPERATE_ARTICLE.WEB, OPERATE_ARTICLE.WAP,OPERATE_ARTICLE.ANDROID,OPERATE_ARTICLE.IOS,OPERATE_ARTICLE.ID, OPERATE_ARTICLE.ARTICLE_TITLE, OPERATE_ARTICLE_TOP.title,OPERATE_ARTICLE_TYPE.IDENTIFIERS,OPERATE_ARTICLE.CREATE_BY, OPERATE_ARTICLE.TYPE_NAME,OPERATE_ARTICLE.TYPE_CODE, OPERATE_ARTICLE.ARTICLE_FROM,OPERATE_ARTICLE.CLICK,
+	     OPERATE_ARTICLE_TYPE.TYPE_CODE as typeTopCode,OPERATE_ARTICLE_TYPE.TYPE_FULL_NAME as typeTopName,OPERATE_ARTICLE.ARTICLE_URL, OPERATE_ARTICLE.ARTICLE_LABEL,  OPERATE_ARTICLE_TOP.COLOR,OPERATE_ARTICLE.ARTICLE_IMG, OPERATE_ARTICLE.ARTICLE_SUMMARY, 
+	    TYPE_PARENT,OPERATE_ARTICLE_TYPE.ORDER_ID,OPERATE_ARTICLE_TOP.ISTOP,OPERATE_ARTICLE_TOP.DOWNTIME,OPERATE_ARTICLE.RELEASE_TIME , case   when OPERATE_ARTICLE.TYPE_ID=114 then 1 else 0 END isVideo
+  	    from   OPERATE_ARTICLE_TOP  left join OPERATE_ARTICLE   on    OPERATE_ARTICLE.ID =OPERATE_ARTICLE_TOP.ARTICLE_ID 
+		left join OPERATE_ARTICLE_TYPE  on  OPERATE_ARTICLE_TOP.type_id = OPERATE_ARTICLE_TYPE.id 
+		where OPERATE_ARTICLE.status=3 and   now() > RELEASE_TIME
+		AND((now() BETWEEN OPERATE_ARTICLE_TOP.UPTIME AND OPERATE_ARTICLE_TOP.DOWNTIME and OPERATE_ARTICLE_TOP.type_id != OPERATE_ARTICLE.type_id ) or  OPERATE_ARTICLE_TOP.type_id= OPERATE_ARTICLE.type_id )
+	)
+   </sql>
+   
+    <!-- 连接基本表,栏目表 -->
+   <sql id="JoinTypeSql">
+  	(select oa.WEB, oa.WAP,oa.ANDROID,oa.IOS,oa.ID, oa.ARTICLE_TITLE,null as title,null as IDENTIFIERS,oa.CREATE_BY, TYPE_NAME,TYPE_CODE , oa.ARTICLE_FROM,oa.CLICK,
+	     TYPE_CODE as typeTopCode,TYPE_NAME as typeTopName,oa.ARTICLE_URL, oa.ARTICLE_LABEL, null as COLOR, oa.ARTICLE_IMG, oa.ARTICLE_SUMMARY, 
+	    null as TYPE_PARENT, null as ORDER_ID, null as ISTOP,null as DOWNTIME,oa.RELEASE_TIME , case   when oa.TYPE_ID=114 then 1 else 0 END isVideo 
+  	    from   OPERATE_ARTICLE oa	
+  	    where oa.status=3 and   now() > RELEASE_TIME
+	)
+   </sql>
+   <!-- 连接用户表，过滤为空的用户和过时的用户 -->
+   <sql id="JoinUserSqlNotUs">
+	     (select cms_user.USER_CNAME as CREATE_USER_CNAME,j.*  from <include refid="JoinTableSql"/> j inner join cms_user on j.creator_id = cms_user.id where USER_STATUS =1  ORDER by RELEASE_TIME  desc) 
+	</sql>
+
+   <!-- rownum分页查询右部分 -->
+	<sql id="Rownum_Query_Condition">
+ 	  		<if test="startRow != null and endRow != null">
+		   		limit #{startRow} ,#{pageSize}
+		 	</if>	
+    </sql>
+   
+	<sql id="platform_Query_Condition">
+		<if test="platform == 1">
+			and WEB = 1
+		</if>
+		<if test="platform == 2">
+			and WAP = 1
+		</if>
+		<if test="platform == 3">
+			and ANDROID = 1
+		</if>
+		<if test="platform == 4">
+			and IOS = 1
+		</if>
+	</sql>
+	<sql id="foreach_platform_Query_Condition">
+		<if test="item.platform == 1">
+			and WEB = 1
+		</if>
+		<if test="item.platform == 2">
+			and WAP = 1
+		</if>
+		<if test="item.platform == 3">
+			and ANDROID = 1
+		</if>
+		<if test="item.platform == 4">
+			and IOS = 1
+		</if>
+	</sql>
+	
+	<!-- 查询当前节点和当前节点之后的数据，去重复 -->
+	<sql id="TypeCode_Sql">
+       select <include refid="Lott_Column_List"/>   
+		from   (
+			select oa.WEB, oa.WAP,oa.ANDROID,oa.IOS,oa.ID, oa.ARTICLE_TITLE, hs.title,oat.IDENTIFIERS,oa.CREATE_BY, oa.TYPE_NAME,oa.TYPE_CODE, oa.ARTICLE_FROM,oa.CLICK,
+	    	oat.TYPE_CODE as typeTopCode,oat.TYPE_FULL_NAME as typeTopName,oa.ARTICLE_URL, oa.ARTICLE_LABEL,  hs.COLOR,oa.ARTICLE_IMG,  oa.ARTICLE_SUMMARY, 
+		    oat.TYPE_PARENT,oat.ORDER_ID,hs.ISTOP,hs.DOWNTIME,oa.RELEASE_TIME ,case  when  oa.TYPE_ID = 114 then 1 else 0 end isVideo
+	  	    from 
+         	 (
+					  select UPTIME,DOWNTIME,type_id,ARTICLE_ID,ISTOP,COLOR,title from OPERATE_ARTICLE_TOP t1 left join OPERATE_ARTICLE_TYPE on type_id = OPERATE_ARTICLE_TYPE.id where type_code = #{typeCode} 	
+					  union
+					  select UPTIME,DOWNTIME,type_id,ARTICLE_ID,ISTOP,COLOR,title from OPERATE_ARTICLE_TOP t1 left join OPERATE_ARTICLE_TYPE on type_id = OPERATE_ARTICLE_TYPE.id where substring(type_code,1,length( CONCAT(#{typeCode},'.'))) =CONCAT(#{typeCode},'.') and 
+					  not exists( 
+						  select *from( select ARTICLE_ID from OPERATE_ARTICLE_TOP left join OPERATE_ARTICLE_TYPE  on type_id = OPERATE_ARTICLE_TYPE.id where type_code = #{typeCode} group by ARTICLE_ID) t2
+						  where t1.ARTICLE_ID = t2.ARTICLE_ID
+					  )	
+		    	)	  hs  	 left join OPERATE_ARTICLE  oa on    oa.ID =hs.ARTICLE_ID 
+			left join OPERATE_ARTICLE_TYPE oat  on  hs.type_id = oat.id 
+			where oa.status=3 and   now() > RELEASE_TIME
+			AND((now() BETWEEN hs.UPTIME AND hs.DOWNTIME and hs.type_id != oa.type_id ) or  hs.type_id= oa.type_id )
+			<include refid="platform_Query_Condition"/>						 	
+		) t
+	</sql>	
+	<sql id="CompleCode_Sql">	
+       select <include refid="Lott_Column_List"/>   
+		from   (
+			select t.* from <include refid="JoinTypeSql"/> t 
+			  where substring(typeTopCode,1,length(#{compleCode})) =#{compleCode}
+			  and t.id not in(
+			  	select OPERATE_ARTICLE.id from   OPERATE_ARTICLE_TOP  left join OPERATE_ARTICLE   on    OPERATE_ARTICLE.ID =OPERATE_ARTICLE_TOP.ARTICLE_ID 					
+					where 
+					substring(type_code,1,length( CONCAT(#{typeCode},'.'))) =CONCAT(#{typeCode},'.') 
+					or type_code = #{typeCode}
+			  )
+			  <include refid="platform_Query_Condition"/>	 	
+		) s
+	</sql>
+	<!-- 查询新闻资讯详细信息 -->
+	<select id="findArticleByTop" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateArticleLottVO" resultMap="LottResultMap">   		  		
+		select t.* from(<include refid="TypeCode_Sql"/>
+		<if test="compleCode != null and isComple!=null and isComple ==1">
+   		   union all
+   		   <include refid="CompleCode_Sql"/>
+ 	  	</if>
+ 	  	) as t
+ 	  	 ORDER BY ISTOP desc, RELEASE_TIME desc
+		 limit #{startRow} ,#{pageSize}  			  			  	
+	</select>
+	<!-- 查询最新的资讯信息 -->
+	<select id="findNewArticle" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateArticleLottVO" resultMap="LottResultMap">   		  		
+			 select t.* from   (
+					select  <include refid="Lott_Column_List"/>  
+					from <include refid="JoinTypeSql"/> t 
+					where 			
+					substring(typeTopCode,1,1) =2 
+					<include refid="platform_Query_Condition"/>	
+					<if test="id != null">
+			   		  and id !=#{id} 
+			 	  	</if>							
+					order by RELEASE_TIME desc	 	
+				)as t
+				<include refid="Rownum_Query_Condition"/>	
+	</select>
+	
+	<!-- 根据类型查询新闻资讯详细信息 -->
+	 <select id="findArticle" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateArticleLottVO" resultMap="LottDetailResultMap">   		  		
+		select *   from OPERATE_ARTICLE 
+		where 1 = 1 
+		<if test="id != null">
+   		    and id = #{id}  
+ 	 	</if>
+ 	 	<if test="articleId != null">
+   		    and article_Id = #{articleId}  
+ 	 	</if>
+	</select> 
+	
+	<!-- pc主页根据类型查询新闻资讯详细信息 -->
+	<select id="findArticleByTypeList" parameterType="list" resultMap="LottBaseResultMap"> 
+	      select * from(  		  				
+			  <foreach collection="list" item="item" separator="UNION ALL" index="index">  
+		                (
+							select t.TYPE_PARENT,<include refid="Lott_Base_Column_List"/>
+							from <include refid="JoinTableSql"/> t 
+						 	where  
+						 	typeTopCode = #{item.typeCode}
+						 	 <include refid="foreach_platform_Query_Condition"/>
+						 	 <if test="item.rownum != null">
+						  order by ISTOP desc, RELEASE_TIME desc
+				   		  limit  #{item.rownum} 
+				 	 	</if>
+						) 							 			
+				  		
+		      </foreach> 
+		  ) t order by t.TYPE_PARENT,t.ORDER_ID, ISTOP desc, RELEASE_TIME desc
+	</select>
+	
+	
+	<!-- 根据类型查询新闻资讯详细信息 -->
+	<select id="findNewsByTypeList" parameterType="list" resultMap="LottResultMap"> 
+	      select * from(  		  				
+			  <foreach collection="list" item="item" separator="UNION ALL">  
+		                 (
+							select t.TYPE_PARENT,<include refid="Lott_Column_List"/> from 
+							
+							(
+								select oa.WEB, oa.WAP,oa.ANDROID,oa.IOS,oa.ID, oa.ARTICLE_TITLE, hs.title,oat.IDENTIFIERS,oa.CREATE_BY, oa.TYPE_NAME,oa.TYPE_CODE, oa.ARTICLE_FROM,oa.CLICK,
+						    	oat.TYPE_CODE as typeTopCode,oat.TYPE_FULL_NAME as typeTopName,oa.ARTICLE_URL, oa.ARTICLE_LABEL,  hs.COLOR,oa.ARTICLE_IMG, oa.ARTICLE_SUMMARY, 
+							    oat.TYPE_PARENT,oat.ORDER_ID,hs.ISTOP,hs.DOWNTIME,oa.RELEASE_TIME , case  when  oa.TYPE_ID=114 then 1 else 0 end isVideo
+						  	    from 
+					         	 (
+										  select UPTIME,DOWNTIME,type_id,ARTICLE_ID,ISTOP,COLOR,title from OPERATE_ARTICLE_TOP t1 left join OPERATE_ARTICLE_TYPE on type_id = OPERATE_ARTICLE_TYPE.id where type_code = #{item.typeCode} 	
+										  union
+										  select UPTIME,DOWNTIME,type_id,ARTICLE_ID,ISTOP,COLOR,title from OPERATE_ARTICLE_TOP t1 left join OPERATE_ARTICLE_TYPE on type_id = OPERATE_ARTICLE_TYPE.id where substring(type_code,1,length(CONCAT(#{item.typeCode},'.'))) =CONCAT(#{item.typeCode},'.') and 
+										  not exists( 
+											  select *from( select ARTICLE_ID from OPERATE_ARTICLE_TOP left join OPERATE_ARTICLE_TYPE  on type_id = OPERATE_ARTICLE_TYPE.id where type_code = #{item.typeCode} group by ARTICLE_ID) t2
+											  where t1.ARTICLE_ID = t2.ARTICLE_ID
+										  )	
+							    	)	  hs  	 left join OPERATE_ARTICLE  oa on    oa.ID =hs.ARTICLE_ID 
+								left join OPERATE_ARTICLE_TYPE oat  on  hs.type_id = oat.id 
+								where oa.status=3 and   now() > RELEASE_TIME
+								AND((now() BETWEEN hs.UPTIME AND hs.DOWNTIME and hs.type_id != oa.type_id ) or  hs.type_id= oa.type_id )
+								<include refid="foreach_platform_Query_Condition"/>										
+							) t 						 	
+						 	<if test="item.rownum != null">
+				   			 limit  #{item.rownum} 
+				 	 		</if>
+						)								 							  		
+		      </foreach> 
+		  ) t order by t.TYPE_PARENT,t.ORDER_ID,ISTOP desc, RELEASE_TIME desc
+	</select>
+	
+	<!-- 根据栏目类型查询管理的用户信息 -->
+	<select id="findUserByArtType" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateArticleLottVO" resultType="com.hhly.skeleton.lotto.base.sys.bo.CmsUserBO"> 
+	      select id as userId,USER_NAME as userName ,USER_CNAME as userCname,remark ,HEAD_URL as headUrl 
+	      from cms_user 
+	      where id in(
+	      		select creator_id  from <include refid="JoinUserSqlNotUs"/> t where typeTopCode = #{typeCode} 	      		
+	      		group by creator_id  		   
+	        
+	      )
+	      limit 0 ,#{rownum} 
+	            
+	</select>
+	
+	<!-- 根据查询专栏下的专家文章信息 -->
+	<select id="findArticleByUserList" parameterType="list" resultMap="UserResultMap"> 
+	      select <include refid="Lott_Column_List"/> ,creator_id from(  		  				
+			  <foreach collection="list" item="item" separator="UNION ALL">  	
+				 	 ( select t.* from <include refid="JoinTableSql"/> t 
+				 	 	    where creator_id = #{item.userId} and typeTopCode = #{item.typeCode}
+				 	 	   	<include refid="foreach_platform_Query_Condition"/>
+							ORDER by RELEASE_TIME desc 
+							limit 0 ,#{item.rownum} 
+						)				 	 					 	 	
+		      </foreach> 
+		  ) t order by t.RELEASE_TIME desc
+	</select>
+	<!-- 查询侧边栏资讯头条信息 ，查询规则查当前节点和子节点下创建的信息-->
+	<select id="findSidebarNews" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateArticleLottVO" resultMap="ArticleResultMap">	   
+	     select id,TYPE_CODE,ARTICLE_TITLE,TYPE_NAME,ARTICLE_URL,ARTICLE_SUMMARY,ARTICLE_LABEL,CLICK,CREATE_BY,RELEASE_TIME from( select * from OPERATE_ARTICLE where type_code = #{typeCode}  and  status=3 and   now() > RELEASE_TIME 	<include refid="platform_Query_Condition"/>
+		      	  union all 
+		  		  select * from OPERATE_ARTICLE where substring(type_code,1,length(CONCAT(#{typeCode},'.'))) =CONCAT(#{typeCode},'.') and type_code != #{typeCode} and  status=3 and   now() > RELEASE_TIME   <include refid="platform_Query_Condition"/>
+		 	 )t 
+		 	 ORDER by click desc, RELEASE_TIME desc 	 
+		 	 limit 0 ,#{rownum}  	 
+	</select>
+  <!-- 更新点击信息 -->
+   <update id="updateClick" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateArticleLottVO">
+   update  OPERATE_ARTICLE set CLICK = (select * from (select IFNULL(CLICK,0)+1 from OPERATE_ARTICLE where id = #{id})  as t ) where id = #{id}
+   </update> 
+    <!-- 批量更新点击信息 -->  
+   <update id="updateClickList" parameterType="java.util.List">
+   		<foreach collection="list" item="item" index="index">
+                update OPERATE_ARTICLE    
+                  set click=#{item.click,jdbcType=INTEGER}   
+                where article_Id = #{item.id};  
+         </foreach> 
+   </update> 
+   
+    <!-- 查询发布时间大于一周前的点击量信息-->
+	<select id="findClick"  resultType="com.hhly.skeleton.lotto.base.operate.bo.ClickBO">	   
+	   select article_Id as  id,CLICK,click as initClick  from   OPERATE_ARTICLE where RELEASE_TIME > now()-7 order by RELEASE_TIME desc
+   </select>
+  
+  <resultMap id="GetArticleResultMap" type="com.hhly.skeleton.lotto.base.operate.bo.OperateArticleLottBO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="ARTICLE_TITLE" property="articleTitle" jdbcType="VARCHAR" />    
+    <result column="TYPE_NAME" property="typeName" jdbcType="VARCHAR" />
+    <result column="ARTICLE_LABEL" property="articleLabel" jdbcType="VARCHAR" />    
+    <result column="ARTICLE_IMG" property="articleImg" jdbcType="VARCHAR" />
+    <result column="RELEASE_TIME" property="releaseTime" jdbcType="TIMESTAMP" />
+    <result column="ARTICLE_URL" property="articleUrl" jdbcType="VARCHAR" />  
+    <result column="ARTICLE_FROM" property="articleFrom" jdbcType="VARCHAR" />
+    <result column="TYPE_CODE" property="typeCode" jdbcType="VARCHAR" /> 
+    <result column="CREATE_BY" property="createBy" jdbcType="VARCHAR" /> 
+    <result column="RELEASE_TIME" property="releaseTime" jdbcType="TIMESTAMP" />          
+  </resultMap>
+  <!-- 根据关键字等信息查询相似的文件 -->
+ <select id="findArticleLabel" statementType="CALLABLE" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateArticleLottVO" resultMap="GetArticleResultMap"> 
+   	{call pr_article_label(
+   		#{typeCode,mode=IN,jdbcType=VARCHAR},
+   		#{articleLabel,mode=IN,jdbcType=VARCHAR},
+   		#{startRow,mode=IN,jdbcType=INTEGER},  
+   		#{pageSize,mode=IN,jdbcType=INTEGER},  				
+   		#{days,mode=IN,jdbcType=INTEGER},
+   		#{platform,mode=IN,jdbcType=INTEGER},
+   		#{id,mode=IN,jdbcType=INTEGER})
+   	} 
+ 	</select>
+ 
+</mapper>

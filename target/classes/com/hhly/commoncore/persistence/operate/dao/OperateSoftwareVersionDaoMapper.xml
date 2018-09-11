@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.commoncore.persistence.operate.dao.OperateSoftwareVersionDaoMapper">
+
+  <sql id="SQL_CONDITION_ALL">
+  	where 1 = 1
+      <if test="id != null">
+        AND S.ID = #{id,jdbcType=INTEGER}
+      </if>
+      <if test="negativeId != null">
+        AND S.ID != #{negativeId,jdbcType=INTEGER}
+      </if>
+      <if test="code != null">
+        AND S.CODE = #{code,jdbcType=INTEGER}
+      </if>
+      <if test="name != null and name != ''">
+        AND S.NAME = #{name,jdbcType=VARCHAR}
+      </if>      
+      <if test="type != null">
+        AND TYPE = #{type,jdbcType=INTEGER}
+      </if>         
+      <if test="isnew != null">
+        AND S.ISNEW = #{isnew,jdbcType=INTEGER}
+      </if>      
+      <if test="isupdate != null">
+        AND S.ISUPDATE = #{isupdate,jdbcType=INTEGER}
+      </if>
+      <if test="beginTime != null">
+       AND S.CREATE_TIME >= #{beginTime,jdbcType=TIMESTAMP} 
+      </if>
+      <if test="endTime != null">
+        AND S.CREATE_TIME <![CDATA[<=]]> #{endTime,jdbcType=TIMESTAMP}
+	  </if>                   
+      <if test="channelId != null">
+        AND S.CHANNEL_ID = #{channelId}
+	  </if>                   
+  </sql>
+  
+  <select id="findSingle" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateSoftwareVersionVO" resultType="com.hhly.skeleton.lotto.base.operate.bo.OperateLottSoftwareVersionBO">
+	  select hide 	  
+  	  from OPERATE_SOFTWARE_VERSION S
+  	  <include refid="SQL_CONDITION_ALL" />
+  </select>
+    
+  <!-- rap接口根据客户端信息查询最新的版本号 -->
+   <select id="findNewVersion" resultType="com.hhly.skeleton.lotto.base.operate.bo.OperateLottSoftwareVersionBO" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateLottSoftwareVersionVO">
+  	  select URL as downloadUrl,SIZES as fileSize , ISUPDATE as upgradeType , CODE as versionCode ,`DESCRIBE` as versionDesc,NAME as versionName,APP_URL wapAppUrl 	  
+  	  from OPERATE_SOFTWARE_VERSION
+  	    <where>
+	      <if test="type != null">
+	        AND TYPE = #{type,jdbcType=INTEGER}
+	      </if>         
+	      <if test="channelId != null">
+	        AND CHANNEL_ID = #{channelId}
+		  </if>                   
+	      <if test="synOfficial != null">
+	        AND syn_official = #{synOfficial}
+		  </if>
+  	    </where>
+  </select>   
+</mapper>

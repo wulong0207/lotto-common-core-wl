@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.operate.dao.OperateHelpTypeDaoMapper">
+	
+	<resultMap  id="TypeBOResultMap" type="com.hhly.skeleton.lotto.base.operate.bo.OperateHelpTypeBO">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="code" property="typeCode" jdbcType="VARCHAR"/>
+		<result column="full_name" property="typeName" jdbcType="VARCHAR"/>
+		<result column="parent" property="parentId" jdbcType="INTEGER"/>
+		<result column="identifiers" property="identifiers" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<resultMap id="LotteryTypeBOResultMap" type="com.hhly.skeleton.lotto.base.operate.bo.OperateHelpLotteryTypeBO">
+		<result property="lotteryCode" column="lottery_code" jdbcType="INTEGER"/>
+		<result property="lotteryName" column="lottery_name" jdbcType="VARCHAR"/>
+		<result property="lotteryLogoUrl" column="lottery_logo_url" jdbcType="VARCHAR"/>
+		<result property="lotteryCategory" column="lottery_category" jdbcType="INTEGER"/>
+		<result property="adminCategory" column="admin_category" jdbcType="INTEGER"/>
+		<result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<select id="findList" resultMap="TypeBOResultMap" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateHelpTypeVO">
+		SELECT oht.id, oht.code, oht.full_name, oht.parent
+		FROM operate_help_type oht
+		WHERE oht.status=1
+		<if test="isVirtual != null">
+			AND oht.isvirtual=#{isVirtual}
+		</if>
+		<if test="menu != null">
+			AND oht.menu= #{menu}
+		</if>
+		<if test="excludeTypeCode != null and excludeTypeCode !=''">
+			AND oht.code not like concat('%', #{excludeTypeCode}, '%')
+		</if>
+		<if test="parentTypeCode != null and parentTypeCode !=''">
+			AND oht.parent in (SELECT id FROM operate_help_type oht2 WHERE oht2.code=#{parentTypeCode})
+		</if>
+		ORDER BY oht.order_id, oht.code
+	</select>
+	
+	<select id="findByCode" resultMap="TypeBOResultMap">
+		SELECT oht.id, oht.code, oht.full_name, oht.parent, oht.identifiers
+		FROM operate_help_type oht
+		WHERE oht.code=#{code, jdbcType=VARCHAR}
+		ORDER BY oht.order_id
+		LIMIT 1
+	</select>
+	
+	<select id="findParentByCode" resultMap="TypeBOResultMap">
+		SELECT oht.id, oht.code, oht.full_name, oht.parent
+		FROM operate_help_type oht
+		WHERE oht.id=(
+			SELECT oht1.parent FROM operate_help_type oht1 
+			WHERE oht1.code=#{code, jdbcType=VARCHAR} 
+			ORDER BY oht1.order_id limit 1)
+		ORDER BY oht.order_id
+		LIMIT 1
+	</select>
+	
+	<sql id="SQL_SELECT_LOTTERY">
+		SELECT id FROM operate_help_type oht2 WHERE oht2.code='1.4'
+	</sql>
+		
+	<select id="findLotteryList" resultMap="LotteryTypeBOResultMap">
+		SELECT lt.lottery_code, lt.lottery_name, lt.lottery_logo_url, lt.lottery_category, lt.admin_category, oht.code type_code
+		FROM lottery_type lt join operate_help_type oht on lt.lottery_code=oht.identifiers
+		WHERE oht.parent=(<include refid="SQL_SELECT_LOTTERY"></include>)
+		AND oht.status=1
+		ORDER BY lt.lottery_code
+	</select>
+
+</mapper>

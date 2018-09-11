@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.trans.dao.TransRechargeDaoMapper">
+
+	<resultMap id="RechargeBOResultMap" type="com.hhly.skeleton.lotto.base.cooperate.bo.CoOperateProxyRechargeBO">
+		<result column="trans_recharge_code" property="transRechargeCode" jdbcType="VARCHAR"/>
+		<result column="trans_status" property="transStatus" jdbcType="TINYINT"/>
+		<result column="recharge_amount" property="rechargeAmount" jdbcType="DECIMAL"/>
+		<result column="trans_time" property="transTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	
+	<sql id="SQL_WHERE_FIND_LIST">
+		WHERE tr.channel_id = #{queryChannelId, jdbcType=VARCHAR}
+		<if test="startTime != null">
+			AND tr.trans_time <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="endTime != null">
+			AND tr.trans_time <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="transRechargeCode != null and transRechargeCode != ''">
+			AND tr.trans_recharge_code = #{transRechargeCode}
+		</if>
+		<choose>
+			<when test="status == 1">
+				AND tr.trans_status = 2
+			</when>
+			<when test="status == 2">
+				AND tr.trans_status in (3, 4) 
+			</when>
+			<otherwise>
+				AND tr.trans_status in (2, 3, 4) 
+			</otherwise>
+		</choose>
+	</sql>
+	
+	<select id="findTotal" resultType="int" parameterType="com.hhly.skeleton.lotto.base.cooperate.vo.CoOperateProxyRechargeVO">
+		SELECT count(*) FROM trans_recharge tr
+		<include refid="SQL_WHERE_FIND_LIST"></include>
+	</select>
+	
+	<select id="findList" resultMap="RechargeBOResultMap" parameterType="com.hhly.skeleton.lotto.base.cooperate.vo.CoOperateProxyRechargeVO">
+		SELECT
+			tr.trans_recharge_code,
+			tr.trans_status,
+			tr.recharge_amount,
+			tr.trans_time
+		FROM trans_recharge tr
+		<include refid="SQL_WHERE_FIND_LIST"></include>
+		limit #{startRow}, #{pageSize}
+	</select>
+</mapper>

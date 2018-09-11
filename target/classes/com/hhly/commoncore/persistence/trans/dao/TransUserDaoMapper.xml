@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.trans.dao.TransUserDaoMapper">
+
+	<resultMap id="RechargeBOResultMap" type="com.hhly.skeleton.lotto.base.cooperate.bo.CoOperateProxyRechargeBO">
+		<result column="trans_code" property="transRechargeCode" jdbcType="VARCHAR"/>
+		<result column="trans_status" property="transStatus" jdbcType="TINYINT"/>
+		<result column="trans_amount" property="rechargeAmount" jdbcType="DECIMAL"/>
+		<result column="cash_amount" property="cashAmount" jdbcType="DECIMAL"/>
+		<result column="red_trans_amount" property="redTransAmount" jdbcType="DECIMAL"/>
+		<result column="trans_time" property="transTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	
+	<sql id="SQL_WHERE_FIND_RECHARGE_LIST">
+		WHERE tu.channel_id = #{queryChannelId, jdbcType=VARCHAR} AND tu.trans_type = 1
+		<if test="startTime != null">
+			AND tu.trans_time <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="endTime != null">
+			AND tu.trans_time <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="transRechargeCode != null and transRechargeCode != ''">
+			AND tu.trans_code = #{transRechargeCode}
+		</if>
+		<choose>
+			<when test="status == 1">
+				AND tu.trans_status = 1
+			</when>
+			<when test="status == 2">
+				AND tu.trans_status = 0
+			</when>
+			<otherwise>
+				AND tu.trans_status in (0, 1)
+			</otherwise>
+		</choose>
+		
+		<choose>
+			<when test="payType == null or payType == 0">
+			</when>
+			<when test="payType == 1">
+				AND tu.cash_amount <![CDATA[>]]> 0
+				AND tu.red_trans_amount <![CDATA[>]]> 0
+			</when>
+			<when test="payType == 2">
+				AND tu.cash_amount <![CDATA[>]]> 0
+				AND tu.red_trans_amount = 0
+			</when>
+			<when test="payType == 3">
+				AND tu.cash_amount = 0
+				AND tu.red_trans_amount <![CDATA[>]]> 0
+			</when>
+			<otherwise>
+				AND 1=2
+			</otherwise>
+		</choose>
+	</sql>
+	
+	<select id="findRechargeTotal" resultType="int" parameterType="com.hhly.skeleton.lotto.base.cooperate.vo.CoOperateProxyRechargeVO">
+		SELECT count(*) FROM trans_user tu
+		<include refid="SQL_WHERE_FIND_RECHARGE_LIST"></include>
+	</select>
+	
+	<select id="findRechargeList" resultMap="RechargeBOResultMap" parameterType="com.hhly.skeleton.lotto.base.cooperate.vo.CoOperateProxyRechargeVO">
+		SELECT
+			tu.trans_code,
+			tu.trans_status,
+			tu.trans_amount,
+			tu.cash_amount,
+			tu.red_trans_amount,
+			tu.trans_time
+		FROM trans_user tu
+		<include refid="SQL_WHERE_FIND_RECHARGE_LIST"></include>
+		ORDER BY tu.trans_time desc
+		<if test="startRow != null and pageSize != null">
+		LIMIT #{startRow}, #{pageSize}
+		</if>
+	</select>
+</mapper>

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.sport.dao.SportAgainstInfoDaoMapper" >
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.sport.bo.SportAgainstInfoBO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="LOTTERY_CODE" property="lotteryCode" jdbcType="DECIMAL" />
+    <result column="ISSUE_CODE" property="issueCode" jdbcType="VARCHAR" />
+    <result column="SPORT_MATCH_INFO_ID" property="sportMatchInfoId" jdbcType="DECIMAL" />
+    <result column="MATCH_ANALYSIS_URL" property="matchAnalysisUrl" jdbcType="VARCHAR" />
+    <result column="MATCH_INFO_URL" property="matchInfoUrl" jdbcType="VARCHAR" />
+    <result column="IS_RECOMMEND" property="isRecommend" jdbcType="DECIMAL" />
+    <result column="MATCH_LABEL_COLOR" property="matchLabelColor" jdbcType="VARCHAR" />
+    <result column="OFFICIAL_MATCH_CODE" property="officialMatchCode" jdbcType="VARCHAR" />
+    <result column="SYSTEM_CODE" property="systemCode" jdbcType="VARCHAR" />
+    <result column="MATCH_STATUS" property="matchStatus" jdbcType="DECIMAL" />
+    <result column="OFFICIAL_ID" property="officialId" jdbcType="VARCHAR" />
+    <result column="START_TIME" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="SALE_END_TIME" property="saleEndTime" jdbcType="TIMESTAMP" />
+    <result column="IS_NEUTRAL" property="isNeutral" jdbcType="DECIMAL" />
+    <result column="STADIUM" property="stadium" jdbcType="VARCHAR" />
+    <result column="WEATHER" property="weather" jdbcType="VARCHAR" />
+    <result column="MODIFY_BY" property="modifyBy" jdbcType="VARCHAR" />
+    <result column="MODIFY_TIME" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="CREATE_BY" property="createBy" jdbcType="VARCHAR" />
+    <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+
+
+  <sql id="Base_Column_List" >
+    ID, LOTTERY_CODE, ISSUE_CODE, SPORT_MATCH_INFO_ID,
+    MATCH_ANALYSIS_URL, MATCH_INFO_URL, IS_RECOMMEND, MATCH_LABEL_COLOR, OFFICIAL_MATCH_CODE, 
+    SYSTEM_CODE, MATCH_STATUS, OFFICIAL_ID, START_TIME, SALE_END_TIME, IS_NEUTRAL, STADIUM, 
+    WEATHER, MODIFY_BY, MODIFY_TIME, CREATE_BY, UPDATE_TIME, CREATE_TIME, REMARK
+  </sql>
+	
+	<!-- 竞彩足球推荐赛事信息 -->
+	 <select id="findSportMatchFBSPInfo" resultType="com.hhly.skeleton.lotto.base.sport.bo.JcMathSPBO">
+		   select ls.*,LOGO_URL as visitiLogoUrl ,TEAM_SHORT_NAME as visitiShortName  from ( 
+		     SELECT A.issue_code issueCode,A.OFFICIAL_MATCH_CODE as officialMatchCode , A.SYSTEM_CODE as systemCode, A. ID,A .LOTTERY_CODE as lotteryCode,SALE_END_TIME as saleEndTime, MATCH_NAME as matchName,START_TIME as startTime,HOME_NAME as homeName,VISITI_NAME as visitiName,
+		        NEWEST_SP_WIN as newestSpWin,NEWEST_SP_DRAW as newestSpDraw,NEWEST_SP_FAIL as newestSpFail,LOGO_URL as homeLogoUrl,TEAM_SHORT_NAME as homeShortName ,VISITI_TEAM_ID
+		      FROM
+	         ( select * from SPORT_AGAINST_INFO where 
+							LOTTERY_CODE = #{lotteryCode}
+							AND IS_RECOMMEND = 1
+							AND MATCH_STATUS = 9
+							AND SALE_END_TIME >now()
+							<if test="queryDate != null" >
+			        		AND	date_format(SALE_END_TIME,'%Y-%m-%d') = #{queryDate,jdbcType=TIMESTAMP}
+			      			</if>
+			 ) A          
+	         left JOIN SPORT_DATA_FB_SP B ON B.SPORT_AGAINST_INFO_ID = A . ID 
+	         left join sport_team_info T1 on HOME_TEAM_ID = T1.id
+	         left join sport_status_fb fb on fb.SPORT_AGAINST_INFO_ID= A . ID 
+         	 WHERE
+			 TEAM_TYPE = 1	
+			 <if test="saleStatus != null" >
+       			AND	(status_wdf = #{saleStatus} or status_let_wdf = #{saleStatus})
+     		 </if>			
+         ) ls left join sport_team_info T2 on VISITI_TEAM_ID = T2.id where TEAM_TYPE = 1
+          ORDER BY ls.systemCode
+	</select>
+	<select id="findSportMatchBBSPInfo" resultType="com.hhly.skeleton.lotto.base.sport.bo.JcMathSPBO">
+		   select ls.*,LOGO_URL as visitiLogoUrl ,TEAM_SHORT_NAME as visitiShortName from ( 
+		    SELECT
+			A.issue_code issueCode,
+			A.OFFICIAL_MATCH_CODE AS officialMatchCode,
+			A.SYSTEM_CODE AS systemCode,
+			A.ID,
+			A.LOTTERY_CODE AS lotteryCode,
+			A.SALE_END_TIME AS saleEndTime,
+			A.MATCH_NAME AS matchName,
+			A.START_TIME AS startTime,
+			A.HOME_NAME AS homeName,
+			A.VISITI_NAME AS visitiName,
+			B.NEWEST_SP_WIN AS newestSpWin,
+			B.NEWEST_SP_FAIL AS newestSpFail,
+			T1.LOGO_URL AS homeLogoUrl,
+			T1.TEAM_SHORT_NAME AS homeShortName,
+			VISITI_TEAM_ID
+		FROM
+		  ( select * from SPORT_AGAINST_INFO where 
+						LOTTERY_CODE = #{lotteryCode}
+						AND IS_RECOMMEND = 1
+						AND MATCH_STATUS = 9
+						AND SALE_END_TIME >now()
+						<if test="queryDate != null" >
+		        		AND	date_format(SALE_END_TIME,'%Y-%m-%d') = #{queryDate,jdbcType=TIMESTAMP}
+		      			</if>
+		 ) A 
+	    left JOIN SPORT_DATA_BB_SP B ON B.SPORT_AGAINST_INFO_ID = A.ID
+		LEFT JOIN sport_team_info T1 ON HOME_TEAM_ID = T1.id
+		LEFT JOIN sport_match_info SI on A.sport_match_info_id = SI.id
+		left join sport_status_bb fb on fb.SPORT_AGAINST_INFO_ID= A . ID 
+		WHERE
+			TEAM_TYPE = 2 and match_type =2
+			<if test="saleStatus != null" >
+       			AND	(status_wdf = #{saleStatus} or status_let_wdf = #{saleStatus})
+     		 </if>
+        ) ls left join sport_team_info T2 on VISITI_TEAM_ID = T2.id where TEAM_TYPE = 2
+         ORDER BY ls.systemCode
+	</select>   
+	<!-- 查询单场至胜时间相同情况下两个赔率相加值最大的赛事 -->
+	<sql id="SQL_DCZS_MAX">
+  		   select t.id from 
+			((SELECT
+			    sum(NEWEST_SP_WIN+NEWEST_LET_SP_FAIL)  as totalNum ,A.id  
+			  FROM SPORT_AGAINST_INFO A
+			  JOIN SPORT_DATA_FB_SP B
+			  ON B.SPORT_AGAINST_INFO_ID = A . ID
+			  WHERE 
+			  LOTTERY_CODE =  #{lotteryCode}
+			  AND MATCH_STATUS = 9
+			  AND start_time =#{date}
+			  AND NEWEST_LET_NUM =-1
+			  <if test="systemCode != null and systemCode != ''">
+			  	and SYSTEM_CODE != #{systemCode}
+			  </if>
+			   group by  A.id)
+			  union  (
+			  SELECT
+			    sum(NEWEST_SP_FAIL+NEWEST_LET_SP_WIN)  as totalNum ,A.id  
+			  FROM SPORT_AGAINST_INFO A
+			  JOIN SPORT_DATA_FB_SP B
+			  ON B.SPORT_AGAINST_INFO_ID = A . ID
+			  WHERE  
+			   LOTTERY_CODE =  #{lotteryCode}
+			  AND MATCH_STATUS = 9
+			  AND start_time =#{date}
+			  AND NEWEST_LET_NUM =1
+			  <if test="systemCode != null and systemCode != ''">
+			  	and SYSTEM_CODE != #{systemCode}
+			  </if>
+			   group by  A.id)
+ 		   ) t 
+ 		   order by t.totalNum desc
+ 		   limit 1
+	</sql>
+
+	<!-- 查询单场至胜时间相同情况下配对赛事信息 -->
+	 <select id="findSportFBMatchDCZSInfo" resultType="com.hhly.skeleton.lotto.base.sport.bo.JcMathWinSPBO">
+		SELECT ls.*,LOGO_URL AS visitiLogoUrl,TEAM_SHORT_NAME as visitiShortName
+		FROM
+		  (SELECT A.SYSTEM_CODE as systemCode,A . ID,A .LOTTERY_CODE as lotteryCode, MATCH_NAME AS matchName,START_TIME AS startTime, HOME_NAME  AS homeName,VISITI_NAME      AS visitiName,
+		    NEWEST_SP_WIN  AS newestSpWin,NEWEST_SP_DRAW   AS newestSpDraw, NEWEST_SP_FAIL   AS newestSpFail,LOGO_URL  AS homeLogoUrl,TEAM_SHORT_NAME as homeShortName ,
+		    VISITI_TEAM_ID,SALE_END_TIME as saleEndTime,NEWEST_LET_NUM as newestLetNum,NEWEST_LET_SP_WIN as  newestLetSpWin,
+		    NEWEST_LET_SP_DRAW as newestLetSpDraw, NEWEST_LET_SP_FAIL as newestLetSpFail
+		    FROM SPORT_AGAINST_INFO A JOIN SPORT_DATA_FB_SP B ON B.SPORT_AGAINST_INFO_ID = A . ID
+         LEFT JOIN sport_team_info T1 ON HOME_TEAM_ID  = T1.id
+		     WHERE TEAM_TYPE  = 1
+		      <if test="queryType == 2">
+		     	AND A.id = ( <include refid="SQL_DCZS_MAX" />)
+			  </if>
+		      <if test="queryType == 1">
+		     	AND A.id = ( <include refid="SQL_DCZS_LEF_MAX" />)		     
+			  </if>
+		  ) ls
+         LEFT JOIN sport_team_info T2
+         ON VISITI_TEAM_ID = T2.id
+		WHERE TEAM_TYPE   = 1
+	</select>
+	<!-- 查询单场至胜比赛时间最相近的配对赛事信息 -->
+	 <select id="findSportFBMatchDCZSLatelyTime" resultType="com.hhly.skeleton.lotto.base.sport.bo.JcMathWinSPBO">
+		select start_time startTime from 
+			((SELECT
+			    start_time ,A.id  
+			  FROM SPORT_AGAINST_INFO A
+			  JOIN SPORT_DATA_FB_SP B
+			  ON B.SPORT_AGAINST_INFO_ID = A . ID
+			  WHERE 
+			  LOTTERY_CODE =  #{lotteryCode}
+			  AND A.visiti_team_id is not null
+			  AND MATCH_STATUS = 9
+			  AND start_time >=#{date}
+			  AND (NEWEST_LET_NUM =-1 or NEWEST_LET_NUM =1)
+			  <if test="systemCode != null and systemCode != ''">
+			  	and SYSTEM_CODE != #{systemCode}
+			  </if>
+			   group by  A.id)			
+ 		   ) t 
+ 		   order by start_time 
+ 		   limit 1
+	</select>
+	<!-- 查询单场至胜小于配对赛事时间两个赔率相加值最大的赛事 -->
+	<sql id="SQL_DCZS_LEF_MAX">
+  		   select t.id from 
+			((SELECT
+			    sum(NEWEST_SP_WIN+NEWEST_LET_SP_FAIL)  as totalNum ,A.id  
+			  FROM SPORT_AGAINST_INFO A
+			  JOIN SPORT_DATA_FB_SP B
+			  ON B.SPORT_AGAINST_INFO_ID = A . ID
+			  WHERE 
+			  LOTTERY_CODE =  #{lotteryCode}
+			  AND MATCH_STATUS = 9
+			  AND  #{date}>start_time
+			  AND SALE_END_TIME>now()
+			  AND NEWEST_LET_NUM =-1
+			  <if test="systemCode != null and systemCode != ''">
+			  	and SYSTEM_CODE != #{systemCode}
+			  </if>
+			   group by  A.id)
+			  union  (
+			  SELECT
+			    sum(NEWEST_SP_FAIL+NEWEST_LET_SP_WIN)  as totalNum ,A.id  
+			  FROM SPORT_AGAINST_INFO A
+			  JOIN SPORT_DATA_FB_SP B
+			  ON B.SPORT_AGAINST_INFO_ID = A . ID
+			  WHERE  
+			   LOTTERY_CODE =  #{lotteryCode}
+			  AND MATCH_STATUS = 9
+			  AND  #{date}>start_time
+			  AND SALE_END_TIME>now()
+			  AND NEWEST_LET_NUM =1
+			  <if test="systemCode != null and systemCode != ''">
+			  	and SYSTEM_CODE != #{systemCode}
+			  </if>
+			   group by  A.id)
+ 		   ) t 
+ 		   order by t.totalNum desc
+ 		   limit 1
+	</sql>
+</mapper>

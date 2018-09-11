@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.cooperate.dao.CoOperateLotteryDaoMapper" >
+	
+	<resultMap id="LotteryPOResultMap" type="com.hhly.commoncore.persistence.cooperate.po.CoOperateLotteryPO">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="channel_id" property="channelId" jdbcType="INTEGER"/>
+		<result column="lottery_code" property="lotteryCode" jdbcType="DECIMAL"/>
+		<result column="denomination" property="denomination" jdbcType="TIMESTAMP"/>
+		<result column="exchange_balance" property="exchangeBalance" jdbcType="TIMESTAMP"/>
+		<result column="lottery_name" property="lotteryName" jdbcType="TIMESTAMP"/>
+	</resultMap>
+
+	<select id="findByChannel" resultMap="LotteryPOResultMap" parameterType="int">
+		SELECT
+			cl.id,
+			channel_id,
+			cl.denomination,
+			cl.exchange_balance,
+			lt.lottery_name
+		FROM cooperate_lottery cl
+		JOIN lottery_type lt ON cl.lottery_code = lt.lottery_code
+		WHERE cl.channel_id = #{channelId, jdbcType=VARCHAR} AND cl.lottery_code = #{lotteryCode, jdbcType=INTEGER}
+	</select>
+	
+</mapper>

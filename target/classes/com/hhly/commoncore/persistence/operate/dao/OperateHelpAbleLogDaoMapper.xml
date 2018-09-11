@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.operate.dao.OperateHelpAbleLogDaoMapper">
+	
+	<resultMap id="AbleBOResultMap" type="com.hhly.skeleton.lotto.base.operate.bo.OperateHelpAbleBO">
+		<result column="is_able" property="isAble" jdbcType="TINYINT"/>
+	</resultMap>
+	
+	
+	<select id="findSingle" resultMap="AbleBOResultMap" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateHelpAbleVO">
+		SELECT ohal.is_able
+		FROM operate_help_able_log ohal
+		WHERE ohal.help_id=#{helpId, jdbcType=INTEGER}
+		AND (
+			<trim prefixOverrides="OR">
+				<if test="userId != null">
+					OR ohal.user_id=#{userId}
+				</if>
+				<if test="ip != null and ip != ''">
+					OR ohal.ip=#{ip, jdbcType=VARCHAR}
+				</if>
+			</trim>
+		)
+		<choose>
+			<when test="userId != null">
+				ORDER BY if(ohal.user_id=#{userId}, 0, 1), CREATE_TIME DESC
+			</when>
+			<otherwise>
+				ORDER BY CREATE_TIME DESC
+			</otherwise>
+		</choose>
+		LIMIT 1
+	</select>
+	
+	<insert id="insert" parameterType="com.hhly.commoncore.persistence.operate.po.OperateHelpAbleLogPO">
+		insert into OPERATE_HELP_ABLE_LOG(HELP_ID, USER_ID, IP, IS_ABLE, CREATE_TIME)
+		values(#{helpId, jdbcType=INTEGER}, #{userId, jdbcType=INTEGER}, #{ip, jdbcType=VARCHAR}, #{isAble, jdbcType=TINYINT}, NOW())
+	</insert>
+	
+</mapper>

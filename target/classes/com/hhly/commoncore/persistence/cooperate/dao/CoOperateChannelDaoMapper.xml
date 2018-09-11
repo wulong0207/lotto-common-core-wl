@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.cooperate.dao.CoOperateChannelDaoMapper" >
+	
+	<resultMap id="ChannelBOResultMap" type="com.hhly.skeleton.lotto.base.cooperate.bo.CoOperateChannelBO">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="channel_id" property="channelId" jdbcType="VARCHAR"/>
+		<result column="channel_name" property="channelName" jdbcType="VARCHAR"/>
+		<result column="balance" property="balance" jdbcType="DECIMAL"/>
+		<result column="single_recharge_amount" property="singleRechargeAmount" jdbcType="DECIMAL"/>
+		<result column="recharge_type" property="rechargeType" jdbcType="TINYINT"/>
+		<result column="coop_start_time" property="coopStartTime" jdbcType="TIMESTAMP"/>
+		<result column="coop_end_time" property="coopEndTime" jdbcType="TIMESTAMP"/>
+		<result column="is_stop" property="channelStatus" jdbcType="TINYINT"/>
+		<result column="secret_key" property="key" jdbcType="VARCHAR"/>
+		<result column="password" property="password" jdbcType="VARCHAR"/>
+		<result column="rcode" property="rcode" jdbcType="VARCHAR"/>
+		<result column="type" property="type" jdbcType="TINYINT"/>
+		<result column="settlement_type" property="settlementType" jdbcType="TINYINT"/>
+	</resultMap>
+	
+	<resultMap id="ChannelPOResultMap" type="com.hhly.commoncore.persistence.cooperate.po.CoOperateChannelPO">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="cooperate_name" property="cooperateName" jdbcType="VARCHAR"/>
+		<result column="balance" property="balance" jdbcType="DECIMAL"/>
+		<result column="action_time" property="actionTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	
+	<resultMap id="ChannelAndHisBOResultMap" type="com.hhly.skeleton.lotto.base.cooperate.bo.CoOperateChannelAndLogBO">
+		<result column="channel_name" property="channelName" jdbcType="VARCHAR"/>
+		<result column="balance" property="balance" jdbcType="DECIMAL"/>
+		<result column="channel_status" property="channelStatus" jdbcType="TINYINT"/>
+		<result column="settlement_type" property="settlementType" jdbcType="TINYINT"/>
+	</resultMap>
+	
+	<select id="findByChannelId" resultMap="ChannelBOResultMap">
+		SELECT 
+			cc.id,
+			omc.channel_id,
+			omc.channel_name,
+			omc.coop_start_time,
+			omc.coop_end_time,
+			cc.is_stop,
+			cc.balance,
+			cc.single_recharge_amount,
+			cc.recharge_type,
+			omc.secret_key,
+			cc.password,
+			cc.rcode,
+			cc.settlement_type,
+			cc.type
+		FROM cooperate_channel cc
+		JOIN operate_market_channel omc ON cc.market_channel_id = omc.channel_id
+		WHERE omc.channel_id=#{channelId, jdbcType=VARCHAR}
+	</select>
+	
+	<select id="findBalanceById" resultMap="ChannelBOResultMap">
+		SELECT  cc.id, cc.balance
+		FROM cooperate_channel cc
+		WHERE cc.id = #{id, jdbcType=INTEGER}
+	</select>
+
+	<select id="findChannelAndHis" resultMap="ChannelAndHisBOResultMap">
+		SELECT 
+			omc.channel_name,
+			omc.channel_status,
+			cc.balance,
+			cc.settlement_type
+		FROM cooperate_channel cc
+		JOIN operate_market_channel omc ON cc.market_channel_id = omc.channel_id
+		WHERE omc.channel_id=#{channelId, jdbcType=VARCHAR}
+	</select>
+	<update id="updateBalance">
+		UPDATE cooperate_channel SET balance = balance - #{exchangeAmount, jdbcType=DECIMAL}
+		WHERE id = #{id, jdbcType=INTEGER}
+		AND balance <![CDATA[>=]]> IF(settlement_type = 1, -200000, 0) + #{exchangeAmount, jdbcType=DECIMAL}
+	</update>
+	
+	<select id="findByChannelName" resultMap="ChannelBOResultMap" parameterType="string">
+		SELECT 
+			cc.id,
+			omc.channel_id,
+			omc.channel_name,
+			omc.coop_start_time,
+			omc.coop_end_time,
+			cc.is_stop,
+			cc.balance,
+			omc.secret_key,
+			cc.password,
+			cc.rcode,
+			cc.settlement_type,
+			cc.type
+		FROM cooperate_channel cc
+		JOIN operate_market_channel omc ON cc.market_channel_id = omc.channel_id
+		WHERE omc.channel_name=#{channelName, jdbcType=VARCHAR}
+		LIMIT 1
+	</select>
+	
+	<update id="updatePassword" parameterType="com.hhly.commoncore.persistence.cooperate.po.CoOperateChannelPO">
+		UPDATE cooperate_channel SET password = #{password, jdbcType=VARCHAR}, rcode = #{rcode, jdbcType=VARCHAR} 
+		WHERE id = #{id, jdbcType=INTEGER}
+	</update>
+	
+	<select id="findAgencyChannelList" resultMap="ChannelBOResultMap" parameterType="string">
+		SELECT
+			omc.channel_id,
+			omc.channel_name,
+			oc2.type,
+			oc2.settlement_type
+		FROM cooperate_channel oc
+		JOIN cooperate_agency ca ON oc.market_channel_id = ca.market_channel_id
+		JOIN cooperate_channel oc2 ON oc2.market_channel_id = ca.channel_id
+		JOIN operate_market_channel omc ON ca.channel_id = omc.channel_id
+		WHERE oc.market_channel_id = #{channelId, jdbcType=VARCHAR}
+		ORDER BY ca.create_time
+	</select>
+</mapper>

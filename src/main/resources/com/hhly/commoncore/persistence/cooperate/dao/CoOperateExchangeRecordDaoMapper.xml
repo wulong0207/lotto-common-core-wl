@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.cooperate.dao.CoOperateExchangeRecordDaoMapper" >
+	<resultMap id="MerchantResultMap" type="com.hhly.skeleton.lotto.base.cooperate.bo.CoOperateChannelMerRecordBO">
+		<result column="pay_class" property="payClass" jdbcType="TINYINT"/>
+		<result column="serial_type" property="serialType" jdbcType="TINYINT"/>
+		<result column="my_cdkey" property="myCdkey" jdbcType="VARCHAR"/>
+		<result column="stauts" property="status" jdbcType="TINYINT"/>
+		<result column="pay_amount" property="payAmount" jdbcType="DECIMAL"/>
+		<result column="order_info" property="orderInfo" jdbcType="VARCHAR"/>
+		<result column="order_code" property="orderCode" jdbcType="VARCHAR"/>		
+		<result column="cus_mobile" property="cusMobile" jdbcType="VARCHAR"/>
+		<result column="exchange_record_time" property="exchangeRecordTime" jdbcType="TIMESTAMP"/>
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	<resultMap id="ChannelOrderBOResultMap" type="com.hhly.skeleton.lotto.base.cooperate.bo.CoOperateChannelOrderBO">
+		<result column="my_cdkey" property="myCdkey" jdbcType="VARCHAR"/>
+		<result column="exchange_over_time" property="exchangeOverTime" jdbcType="TIMESTAMP"/>
+		<result column="lottery_code" property="lotteryCode" jdbcType="INTEGER"/>
+		<result column="lottery_name" property="lotteryName" jdbcType="INTEGER"/>
+		<result column="order_code" property="orderCode" jdbcType="VARCHAR"/>
+		<result column="account_name" property="accountName" jdbcType="VARCHAR"/>
+		<result column="cus_mobile" property="cusMobile" jdbcType="VARCHAR"/>
+		<result column="cdkey_status" property="cdkeyStatus" jdbcType="TINYINT"/>
+		<result column="order_status" property="orderStatus" jdbcType="TINYINT"/>
+		<result column="winning_status" property="winningStatus" jdbcType="TINYINT"/>
+		<result column="pre_bonus" property="preBonus" jdbcType="DECIMAL"/>
+		<result column="exchange_time" property="exchangeTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	<sql id="merchant_select_sql">
+  		<if test="status == 1">
+			and cer.pay_class=1 and cer.serial_type=1
+		</if>
+		<if test="status == 2">
+			and cc.stauts = 4
+		</if>
+		<if test="status == 3">
+			and (cc.stauts = 1 or cc.stauts = 3)
+		</if>
+		<if test="status == 4">
+			and cc.stauts = 5
+		</if>
+		<if test="startTime != null">
+			and cer.modify_time >=#{startTime}
+		</if>
+		<if test="endTime != null">
+			and  #{endTime}>=cer.modify_time
+		</if>
+		<if test="lotteryCode !=null">
+			and cc.lottery_code = #{lotteryCode}
+		</if>
+		<if test="myCdkey !=null and myCdkey !=''">
+			and cc.my_cdkey = #{myCdkey}
+		</if>
+	</sql>
+	<sql id="merchant_blan_select_sql">
+  		<if test="status == 1">
+			and cer.pay_class=1 and cer.serial_type=1
+		</if>
+		<if test="startTime != null">
+			and cer.modify_time >=#{startTime}
+		</if>
+		<if test="endTime != null">
+			and  #{endTime}>=cer.modify_time
+		</if>	
+		<if test="myCdkey !=null  and myCdkey !=''">
+			and cer.my_cdkey = #{myCdkey}
+		</if>
+	</sql>
+	<sql id="merchant_status_select_sql">
+  		<if test="status == 2">
+			and t.stauts = 4
+		</if>
+		<if test="status == 3">
+			and (t.stauts = 1 or t.stauts = 3)
+		</if>
+		<if test="status == 4">
+			and t.stauts = 5
+		</if>
+		<if test="lotteryCode !=null">
+			and t.lotteryCode = #{lotteryCode}
+		</if>
+	</sql>
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO cooperate_exchange_record (
+			p_serial, pay_class,
+			channel_balance, serial_number, serial_type,
+			cdkey_id, my_cdkey, channel_id, exchange_over_time,
+			pay_amount, order_info,
+			create_by, create_time, modify_by, modify_time
+		) VALUES(	
+			#{pSerial, jdbcType=VARCHAR}, #{payClass, jdbcType=TINYINT}, 
+			#{channelBalance, jdbcType=DECIMAL}, #{serialNumber, jdbcType=VARCHAR},#{serialType, jdbcType=VARCHAR},
+			#{cdkeyId, jdbcType=INTEGER}, #{myCdkey, jdbcType=VARCHAR}, #{channelId, jdbcType=INTEGER},
+			#{exchangeOverTime, jdbcType=TIMESTAMP},
+			#{payAmount, jdbcType=DECIMAL}, #{orderInfo, jdbcType=VARCHAR},
+			#{createBy, jdbcType=VARCHAR}, now(), #{modifyBy, jdbcType=VARCHAR}, now())
+	</insert>
+	
+	<insert id="insertBatch">
+		INSERT INTO cooperate_exchange_record (
+			p_serial, pay_class, channel_balance, serial_number, serial_type,
+			cdkey_id, my_cdkey, channel_id, exchange_over_time,
+			pay_amount, order_info, create_by, create_time, modify_by, modify_time
+		) VALUES
+		<foreach collection="exchangePOList" item="exchangePO" separator=",">
+			(#{exchangePO.pSerial, jdbcType=VARCHAR}, #{exchangePO.payClass, jdbcType=TINYINT},
+			#{exchangePO.channelBalance, jdbcType=DECIMAL}, #{exchangePO.serialNumber, jdbcType=VARCHAR},
+			#{exchangePO.serialType, jdbcType=VARCHAR},
+			#{exchangePO.cdkeyId, jdbcType=INTEGER}, #{exchangePO.myCdkey, jdbcType=VARCHAR}, 
+			#{exchangePO.channelId, jdbcType=INTEGER}, #{exchangePO.exchangeOverTime, jdbcType=TIMESTAMP},
+			#{exchangePO.payAmount, jdbcType=DECIMAL}, #{exchangePO.orderInfo, jdbcType=VARCHAR},
+			#{exchangePO.createBy, jdbcType=VARCHAR}, now(), #{exchangePO.modifyBy, jdbcType=VARCHAR}, now())
+		</foreach>
+	</insert>
+	
+	<select id="findOrderInfo"></select>
+	
+	<update id="updateOrderCode">
+		UPDATE cooperate_exchange_record
+		SET order_code = #{orderCode, jdbcType=VARCHAR}, 
+		order_info = #{orderInfo, jdbcType=VARCHAR}, 
+		exchange_record_time = now(), modify_by=#{modifyBy, jdbcType=VARCHAR}, modify_time=now()
+		WHERE my_cdkey=#{myCdkey, jdbcType=VARCHAR}
+	</update>
+	
+	<update id="updateCdkeyOrderCode">
+		UPDATE cooperate_exchange_record cer join cooperate_cdkey cc on cer.cdkey_id=cc.id
+		SET cer.order_code = #{orderCode, jdbcType=VARCHAR}, 
+		cer.order_info = #{orderInfo, jdbcType=VARCHAR}, 
+		cer.exchange_record_time = now(), cer.modify_by=#{modifyBy, jdbcType=VARCHAR},cer. modify_time=now()
+		WHERE cc.my_cdkey = #{myCdkey, jdbcType=VARCHAR}
+	</update>
+	<!--查询余额商户 -->
+	<select id="findMerchantBalanceInfo" resultMap="MerchantResultMap" parameterType="com.hhly.skeleton.lotto.base.cooperate.vo.CoOperateRecordQueryVO">
+		select * from (SELECT
+			cer.id,
+			cer.pay_class,
+			cer.serial_type,
+			cer.my_cdkey,
+			cer.pay_amount,
+			cer.order_info,
+			cer.order_code,
+			cer.create_time,
+			cer.exchange_record_time,
+			mui.cus_mobile,
+			(select cc.stauts from cooperate_cdkey cc where cc.my_cdkey=cer.my_cdkey limit 1) stauts,
+			(select cc.lottery_code from cooperate_cdkey cc where cc.my_cdkey=cer.my_cdkey limit 1) lotteryCode
+		FROM
+			cooperate_exchange_record cer
+		LEFT JOIN order_info oi ON cer.order_code = oi.order_code
+		LEFT JOIN m_user_info mui ON oi.user_id = mui.id
+		WHERE cer.channel_id=#{channelId} and serial_type=1
+		<include refid="merchant_blan_select_sql"/>
+		order by cer.create_time desc
+		)t
+		where 1=1
+		<include refid="merchant_status_select_sql"/>				
+		limit #{startRow}, #{pageSize}
+	</select>
+	<!--查询余额商户 -->
+	<select id="findMerchantBalanceTotal" resultType="int" parameterType="com.hhly.skeleton.lotto.base.cooperate.vo.CoOperateRecordQueryVO">
+		select count(*) from (
+				SELECT
+					cer.id,
+					(select cc.stauts from cooperate_cdkey cc where cc.my_cdkey=cer.my_cdkey limit 1) stauts,
+					(select cc.lottery_code from cooperate_cdkey cc where cc.my_cdkey=cer.my_cdkey limit 1) lotteryCode
+				FROM
+					cooperate_exchange_record cer
+				LEFT JOIN order_info oi ON cer.order_code = oi.order_code
+				LEFT JOIN m_user_info mui ON oi.user_id = mui.id
+				WHERE cer.channel_id=#{channelId} and serial_type=1
+				<include refid="merchant_blan_select_sql"/>
+		)t
+		where 1=1 		
+		<include refid="merchant_status_select_sql"/>		
+	</select>
+	
+	<!-- 查询库存商户-->
+	<select id="findMerchantNumInfo" resultMap="MerchantResultMap" parameterType="com.hhly.skeleton.lotto.base.cooperate.vo.CoOperateRecordQueryVO">
+		SELECT
+		cer.id,
+		cer.pay_class,
+		cer.serial_type,
+		cc.my_cdkey,	
+		cer.pay_amount,
+		cer.order_info,
+		cer.order_code,
+		cer.create_time,
+		cer.exchange_record_time,
+		mui.cus_mobile,
+		cc.stauts
+		FROM
+			cooperate_exchange_record cer
+		LEFT JOIN order_info oi ON cer.order_code = oi.order_code
+		LEFT JOIN m_user_info mui on oi.user_id=mui.id
+		LEFT JOIN cooperate_cdkey cc ON cer.cdkey_id = cc.id  	
+		WHERE cer.channel_id=#{channelId}
+		<include refid="merchant_select_sql"/>
+		order by cer.create_time desc
+		limit #{startRow}, #{pageSize}
+	</select>
+	
+	<!--查询库存商户 -->
+	<select id="findMerchantNumTotal" resultType="int" parameterType="com.hhly.skeleton.lotto.base.cooperate.vo.CoOperateRecordQueryVO">
+			SELECT
+				count(cer.id)
+			FROM
+				cooperate_exchange_record cer
+			LEFT JOIN order_info oi ON cer.order_code = oi.order_code
+			LEFT JOIN cooperate_cdkey cc ON cer.cdkey_id = cc.id  
+			WHERE cer.channel_id=#{channelId}
+			<include refid="merchant_select_sql"/>
+	</select>
+	<!-- 统计商户库存彩种信息 -->
+	<select  id="findMerchantLotteryInfo" resultType="com.hhly.skeleton.lotto.base.cooperate.bo.CoOperateChannelLotteryBO" parameterType="int">
+		SELECT
+		denomination exchangeBalance,count(cc.lottery_code) num,cc.lottery_code lotteryCode,lt.lottery_logo_url lotteryLogoUrl,lt.lottery_name lotteryName
+		FROM
+			cooperate_exchange_record cer
+		LEFT JOIN cooperate_cdkey cc ON cer.cdkey_id = cc.id
+		LEFT JOIN lottery_type lt on cc.lottery_code=lt.lottery_code
+		LEFT JOIN cooperate_lottery cl on cc.lottery_code =cl.lottery_code and cl.channel_id=cer.channel_id
+		WHERE
+			cer.channel_id = #{channelId} and cc.stauts in(1,2,3)
+		GROUP BY cc.lottery_code
+		union
+		SELECT
+			denomination exchangeBalance,
+			0 num,
+			cc.lottery_code lotteryCode,
+			lt.lottery_logo_url lotteryLogoUrl,
+			lt.lottery_name lotteryName
+		FROM
+			cooperate_exchange_record cer
+		LEFT JOIN cooperate_cdkey cc ON cer.cdkey_id = cc.id
+		LEFT JOIN lottery_type lt ON cc.lottery_code = lt.lottery_code
+		LEFT JOIN cooperate_lottery cl ON cc.lottery_code = cl.lottery_code
+		AND cl.channel_id = cer.channel_id
+		WHERE
+			cer.channel_id =  #{channelId}
+			AND cc.stauts = 4
+			AND cc.lottery_code not in(
+			SELECT
+				cc.lottery_code
+				FROM
+					cooperate_exchange_record cer
+				LEFT JOIN cooperate_cdkey cc ON cer.cdkey_id = cc.id
+				WHERE
+					cer.channel_id = #{channelId} and cc.stauts in(1,2,3)
+				GROUP BY cc.lottery_code
+			)
+		GROUP BY
+			cc.lottery_code 
+			
+	</select>
+	<!-- 统计商户库存彩种列表 -->
+	<select  id="findMerchantLotteryCombobox" resultType="com.hhly.skeleton.lotto.base.cooperate.bo.CoOperateChannelLotteryBO" parameterType="int">
+		SELECT
+		cc.lottery_code lotteryCode,lt.lottery_name lotteryName
+		FROM
+			cooperate_exchange_record cer
+		LEFT JOIN cooperate_cdkey cc ON cer.cdkey_id = cc.id
+		LEFT JOIN lottery_type lt on cc.lottery_code=lt.lottery_code
+		WHERE
+			cer.channel_id = #{channelId} and cc.lottery_code is not null
+		GROUP BY cc.lottery_code	
+	</select>
+	<!-- 统计商户余额类彩种列表 -->
+	<select  id="findMerchBalaLottoCombobox" resultType="com.hhly.skeleton.lotto.base.cooperate.bo.CoOperateChannelLotteryBO" parameterType="int">
+		SELECT
+		lt.lottery_name lotteryName,	cc.lottery_code lotteryCode
+		FROM
+			cooperate_exchange_record cer
+		LEFT JOIN cooperate_cdkey cc ON cc.my_cdkey=cer.my_cdkey
+		LEFT JOIN Lottery_Type lt on cc.lottery_code=lt.lottery_code
+		where   cer.channel_id=#{channelId}   and cc.lottery_code is not null
+		GROUP BY   cc.lottery_code
+	</select>
+	<!-- 查询渠道订单信息 -->
+	<sql id="SQL_SELECT_FIND_CHANNEL_ORDER">
+		SELECT 
+			cc.my_cdkey,
+			cc.stauts cdkey_status,
+			cc.lottery_code,
+			lt.lottery_name,
+			ifnull(oi.create_time, cer.create_time) exchange_time,
+			cer.exchange_over_time,
+			oi.order_code,
+			oi.order_status,
+			oi.winning_status,
+			oi.pre_bonus,
+			u.account_name,
+			u.cus_mobile
+	</sql>
+	<sql id="SQL_WHERE_FIND_CHANNEL_ORDER">
+		WHERE cer.channel_id = #{queryChannelId, jdbcType=VARCHAR}
+		<if test="startTime != null">
+			AND ifnull(oi.create_time, cer.create_time) <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="endTime != null">
+			AND ifnull(oi.create_time, cer.create_time) <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="cusMobile !=null and cusMobile !=''">
+			AND u.cus_mobile=#{cusMobile}
+		</if>
+		<if test="orderCode != null and orderCode != ''">
+			AND oi.order_code=#{orderCode}
+		</if>
+		<choose>
+			<when test="status == 1">
+				AND cc.stauts in (1, 3)
+			</when>
+			<when test="status == 2">
+				AND cc.stauts = 4 AND oi.winning_status = 1
+			</when>
+			<when test="status == 3">
+				AND cc.stauts = 4 AND oi.winning_status in (3, 4)
+			</when>
+			<when test="status == 4">
+				AND cc.stauts = 4 AND oi.winning_status = 2
+			</when>
+			<when test="status == 5">
+				AND (cc.stauts = 5 OR cer.exchange_over_time <![CDATA[<]]> now())
+			</when>
+			<otherwise>
+				AND cc.stauts != 2
+			</otherwise>
+		</choose>
+	</sql>
+	<select id="findChannelOrderTotal" resultType="int" parameterType="com.hhly.skeleton.lotto.base.cooperate.vo.CoOperateAgencyVO">
+		SELECT sum(cnt)
+		FROM (
+			SELECT count(DISTINCT cc.my_cdkey) cnt
+			FROM cooperate_exchange_record cer
+			JOIN cooperate_cdkey cc ON cc.my_cdkey = cer.my_cdkey
+			LEFT JOIN order_info oi ON cer.order_code = oi.order_code
+			LEFT JOIN m_user_info u ON oi.user_id = u.id
+			<include refid="SQL_WHERE_FIND_CHANNEL_ORDER"></include>
+			AND cer.pay_class=2
+			UNION ALL
+			SELECT count(*) cnt
+			FROM cooperate_exchange_record cer
+			JOIN cooperate_cdkey cc ON cc.id = cer.cdkey_id
+			LEFT JOIN order_info oi ON cer.order_code = oi.order_code
+			LEFT JOIN m_user_info u ON oi.user_id = u.id
+			<include refid="SQL_WHERE_FIND_CHANNEL_ORDER"></include>
+			AND cer.pay_class=1
+		) tmp
+	</select>
+	<select id="findChannelOrderList" resultMap="ChannelOrderBOResultMap" parameterType="com.hhly.skeleton.lotto.base.cooperate.vo.CoOperateAgencyVO">
+		SELECT * 
+		FROM (
+			<include refid="SQL_SELECT_FIND_CHANNEL_ORDER"></include>
+			FROM cooperate_exchange_record cer
+			JOIN cooperate_cdkey cc ON cc.my_cdkey = cer.my_cdkey
+			JOIN lottery_type lt on cc.lottery_code=lt.lottery_code
+			LEFT JOIN order_info oi ON cer.order_code = oi.order_code
+			LEFT JOIN m_user_info u ON oi.user_id = u.id
+			<include refid="SQL_WHERE_FIND_CHANNEL_ORDER"></include>
+			AND cer.pay_class=2
+			GROUP BY cc.my_cdkey
+			UNION ALL
+			<include refid="SQL_SELECT_FIND_CHANNEL_ORDER"></include>
+			FROM cooperate_exchange_record cer
+			JOIN cooperate_cdkey cc ON cc.id = cer.cdkey_id
+			JOIN lottery_type lt on cc.lottery_code=lt.lottery_code
+			LEFT JOIN order_info oi ON cer.order_code = oi.order_code
+			LEFT JOIN m_user_info u ON oi.user_id = u.id
+			<include refid="SQL_WHERE_FIND_CHANNEL_ORDER"></include>
+			AND cer.pay_class=1
+		) tmp
+		ORDER BY tmp.exchange_time DESC
+		<if test="startRow != null and pageSize != null">
+			LIMIT #{startRow} , #{pageSize}
+		</if>
+	</select>
+</mapper>

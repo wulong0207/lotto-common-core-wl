@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.operate.dao.OperateArticleTypeDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateArticleTypeBO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="TYPE_CODE" property="typeCode" jdbcType="VARCHAR" />
+    <result column="TYPE_FULL_NAME" property="typeFullName" jdbcType="VARCHAR" />
+    <result column="TYPE_SHORT_NAME" property="typeShortName" jdbcType="VARCHAR" />
+    <result column="TYPE_PARENT" property="typeParent" jdbcType="DECIMAL" />
+    <result column="TYPE_LEVEL" property="typeLevel" jdbcType="TINYINT" />
+    <result column="STATUS" property="status" jdbcType="TINYINT" />
+    <result column="ORDER_ID" property="orderId" jdbcType="SMALLINT" />
+    <result column="IDENTIFIERS" property="identifiers" jdbcType="VARCHAR" />
+    <result column="TYPE_DESC" property="typeDesc" jdbcType="VARCHAR" />
+    <result column="ISVIRTUAL" property="virtual" jdbcType="TINYINT" />
+  </resultMap>
+  
+   <sql id="Base_Column_List" >
+    ID, TYPE_CODE, TYPE_FULL_NAME, TYPE_SHORT_NAME, TYPE_PARENT, TYPE_LEVEL, STATUS, 
+    ORDER_ID, IDENTIFIERS, TYPE_DESC,ISVIRTUAL
+  </sql>
+  
+  <sql id="Query_Condition">
+  	<where>
+  		<if test="typeParent != null">
+			TYPE_PARENT = #{typeParent}
+  		</if>
+  		<if test="id != null">
+			and id = #{id}
+  		</if>
+  		<if test="excludedId != null">
+			and id != #{excludedId}
+  		</if>
+  		<if test="identifiers != null">
+			and IDENTIFIERS = #{identifiers}
+  		</if>
+	</where>
+  </sql>
+  
+  <sql id="Table">
+  	OPERATE_ARTICLE_TYPE
+  </sql>
+  
+   <!-- 根据栏目查询子栏目信息 -->
+   <select id="findListByFaType" resultType="com.hhly.skeleton.lotto.base.operate.bo.OperateArticleTypeLottBO">
+      select TYPE_CODE as typeCode ,TYPE_FULL_NAME as typeName from OPERATE_ARTICLE_TYPE where type_parent in(select id from OPERATE_ARTICLE_TYPE where TYPE_CODE =#{typeCode})
+  </select>
+  <!-- 查询资讯下的所有栏目信息 -->
+   <select id="findNewsTypeList" resultType="com.hhly.skeleton.lotto.base.operate.bo.OperateArticleBaseBO">
+      select TYPE_CODE as typeCode ,TYPE_FULL_NAME as typeName from OPERATE_ARTICLE_TYPE 
+      where STATUS =1
+      order by order_id,id
+  </select>
+  <!-- 查询所有栏目关系 -->
+    <select id="findNewTypeRelatList" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateArticleLottVO"  resultType="com.hhly.skeleton.lotto.base.operate.bo.OperateArticleLottBO">   		  		
+		select id,TYPE_CODE as typeCode,TYPE_FULL_NAME as typeName,TYPE_PARENT as parent from 	OPERATE_ARTICLE_TYPE 
+		where  status=1 and substr(TYPE_CODE,1,1) =2 
+		<if test="platform != null and platform!=1">
+			and TYPE_CODE not in ('2.1','2.2')
+  		</if>
+		order by order_id
+	</select> 
+</mapper>

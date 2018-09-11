@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.sport.dao.SportDataFbSpDaoMapper" >
+	<resultMap id="SportNewestDataFbBOResultMap" type="com.hhly.skeleton.lotto.base.sport.bo.SportNewestDataFbBO">
+		<result column="system_code" property="systemCode" jdbcType="VARCHAR"/>
+		<result column="issue_code" property="issueCode" jdbcType="VARCHAR"/>
+		<result column="home_name" property="homeName" jdbcType="VARCHAR"/>
+		<result column="visiti_name" property="guestName" jdbcType="VARCHAR"/>
+		<result column="match_status" property="matchStatus" jdbcType="TINYINT"/>
+		<result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+		<result column="half_score" property="halfScore" jdbcType="VARCHAR"/>
+		<result column="full_score" property="fullScore" jdbcType="VARCHAR"/>
+		<result column="status_wdf" property="wdfStatus" jdbcType="TINYINT"/>
+		<result column="status_let_wdf" property="letWdfStatus" jdbcType="TINYINT"/>
+		<result column="status_goal" property="goalStatus" jdbcType="TINYINT"/>
+		<result column="status_score" property="scoreStatus" jdbcType="TINYINT"/>
+		<result column="status_hf_wdf" property="hfWdfStatus" jdbcType="TINYINT"/>
+		<result column="newest_let_num" property="newestLetNum" jdbcType="INTEGER"/>
+		<result column="newest_sp_win" property="newestSpWin" jdbcType="DECIMAL"/>
+		<result column="newest_sp_draw" property="newestSpDraw" jdbcType="DECIMAL"/>
+		<result column="newest_sp_fail" property="newestSpFail" jdbcType="DECIMAL"/>
+		<result column="newest_let_sp_win" property="newestLetSpWin" jdbcType="DECIMAL"/>
+		<result column="newest_let_sp_draw" property="newestLetSpDraw" jdbcType="DECIMAL"/>
+		<result column="newest_let_sp_fail" property="newestLetSpFail" jdbcType="DECIMAL"/>
+		<result column="newest_sp_0_goal" property="newestSp0Goal" jdbcType="DECIMAL"/>
+		<result column="newest_sp_1_goal" property="newestSp1Goal" jdbcType="DECIMAL"/>
+		<result column="newest_sp_2_goal" property="newestSp2Goal" jdbcType="DECIMAL"/>
+		<result column="newest_sp_3_goal" property="newestSp3Goal" jdbcType="DECIMAL"/>
+		<result column="newest_sp_4_goal" property="newestSp4Goal" jdbcType="DECIMAL"/>
+		<result column="newest_sp_5_goal" property="newestSp5Goal" jdbcType="DECIMAL"/>
+		<result column="newest_sp_6_goal" property="newestSp6Goal" jdbcType="DECIMAL"/>
+		<result column="newest_sp_7_goal" property="newestSp7Goal" jdbcType="DECIMAL"/>
+		<result column="newest_sp_w_w" property="newestSpWW" jdbcType="DECIMAL"/>
+		<result column="newest_sp_w_d" property="newestSpWD" jdbcType="DECIMAL"/>
+		<result column="newest_sp_w_f" property="newestSpWF" jdbcType="DECIMAL"/>
+		<result column="newest_sp_d_w" property="newestSpDW" jdbcType="DECIMAL"/>
+		<result column="newest_sp_d_d" property="newestSpDD" jdbcType="DECIMAL"/>
+		<result column="newest_sp_d_f" property="newestSpDF" jdbcType="DECIMAL"/>
+		<result column="newest_sp_f_w" property="newestSpFW" jdbcType="DECIMAL"/>
+		<result column="newest_sp_f_d" property="newestSpFD" jdbcType="DECIMAL"/>
+		<result column="newest_sp_f_f" property="newestSpFF" jdbcType="DECIMAL"/>
+		<result column="newest_sp_1_0" property="newestSp10" jdbcType="DECIMAL"/>
+		<result column="newest_sp_2_0" property="newestSp20" jdbcType="DECIMAL"/>
+		<result column="newest_sp_2_1" property="newestSp21" jdbcType="DECIMAL"/>
+		<result column="newest_sp_3_0" property="newestSp30" jdbcType="DECIMAL"/>
+		<result column="newest_sp_3_1" property="newestSp31" jdbcType="DECIMAL"/>
+		<result column="newest_sp_3_2" property="newestSp32" jdbcType="DECIMAL"/>
+		<result column="newest_sp_4_0" property="newestSp40" jdbcType="DECIMAL"/>
+		<result column="newest_sp_4_1" property="newestSp41" jdbcType="DECIMAL"/>
+		<result column="newest_sp_4_2" property="newestSp42" jdbcType="DECIMAL"/>
+		<result column="newest_sp_5_0" property="newestSp50" jdbcType="DECIMAL"/>
+		<result column="newest_sp_5_1" property="newestSp51" jdbcType="DECIMAL"/>
+		<result column="newest_sp_5_2" property="newestSp52" jdbcType="DECIMAL"/>
+		<result column="newest_sp_w_other" property="newestSpWOther" jdbcType="DECIMAL"/>
+		<result column="newest_sp_0_0" property="newestSp00" jdbcType="DECIMAL"/>
+		<result column="newest_sp_1_1" property="newestSp11" jdbcType="DECIMAL"/>
+		<result column="newest_sp_2_2" property="newestSp22" jdbcType="DECIMAL"/>
+		<result column="newest_sp_3_3" property="newestSp33" jdbcType="DECIMAL"/>
+		<result column="newest_sp_d_other" property="newestSpDOther" jdbcType="DECIMAL"/>
+		<result column="newest_sp_0_1" property="newestSp01" jdbcType="DECIMAL"/>
+		<result column="newest_sp_0_2" property="newestSp02" jdbcType="DECIMAL"/>
+		<result column="newest_sp_1_2" property="newestSp12" jdbcType="DECIMAL"/>
+		<result column="newest_sp_0_3" property="newestSp03" jdbcType="DECIMAL"/>
+		<result column="newest_sp_1_3" property="newestSp13" jdbcType="DECIMAL"/>
+		<result column="newest_sp_2_3" property="newestSp23" jdbcType="DECIMAL"/>
+		<result column="newest_sp_0_4" property="newestSp04" jdbcType="DECIMAL"/>
+		<result column="newest_sp_1_4" property="newestSp14" jdbcType="DECIMAL"/>
+		<result column="newest_sp_2_4" property="newestSp24" jdbcType="DECIMAL"/>
+		<result column="newest_sp_0_5" property="newestSp05" jdbcType="DECIMAL"/>
+		<result column="newest_sp_1_5" property="newestSp15" jdbcType="DECIMAL"/>
+		<result column="newest_sp_2_5" property="newestSp25" jdbcType="DECIMAL"/>
+		<result column="newest_sp_f_other" property="newestSpFOther" jdbcType="DECIMAL"/>
+	</resultMap>
+	
+	<select id="findFbNewestData" resultMap="SportNewestDataFbBOResultMap" parameterType="com.hhly.skeleton.lotto.base.sport.vo.SportNewestDataVO">
+		SELECT sai.system_code,
+			sai.issue_code,
+			sai.home_name,
+			sai.visiti_name, 
+			sai.match_status,
+			sai.start_time,
+			sdf.half_score,
+			sdf.full_score,
+			ssf.status_wdf,
+			ssf.status_let_wdf,
+			ssf.status_score,
+			ssf.status_goal,
+			ssf.status_hf_wdf,
+			sdfs.newest_let_num,
+			sdfs.newest_sp_win,
+			sdfs.newest_sp_draw,
+			sdfs.newest_sp_fail,
+			sdfs.newest_let_sp_win,
+			sdfs.newest_let_sp_draw,
+			sdfs.newest_let_sp_fail,
+			sdfs.newest_sp_0_goal,
+			sdfs.newest_sp_1_goal,
+			sdfs.newest_sp_2_goal,
+			sdfs.newest_sp_3_goal,
+			sdfs.newest_sp_4_goal,
+			sdfs.newest_sp_5_goal,
+			sdfs.newest_sp_6_goal,
+			sdfs.newest_sp_7_goal,
+			sdfs.newest_sp_w_w,
+			sdfs.newest_sp_w_d,
+			sdfs.newest_sp_w_f,
+			sdfs.newest_sp_d_w,
+			sdfs.newest_sp_d_d,
+			sdfs.newest_sp_d_f,
+			sdfs.newest_sp_f_w,
+			sdfs.newest_sp_f_d,
+			sdfs.newest_sp_f_f,
+			sdfs.newest_sp_1_0,
+			sdfs.newest_sp_2_0,
+			sdfs.newest_sp_2_1,
+			sdfs.newest_sp_3_0,
+			sdfs.newest_sp_3_1,
+			sdfs.newest_sp_3_2,
+			sdfs.newest_sp_4_0,
+			sdfs.newest_sp_4_1,
+			sdfs.newest_sp_4_2,
+			sdfs.newest_sp_5_0,
+			sdfs.newest_sp_5_1,
+			sdfs.newest_sp_5_2,
+			sdfs.newest_sp_w_other,
+			sdfs.newest_sp_0_0,
+			sdfs.newest_sp_1_1,
+			sdfs.newest_sp_2_2,
+			sdfs.newest_sp_3_3,
+			sdfs.newest_sp_d_other,
+			sdfs.newest_sp_0_1,
+			sdfs.newest_sp_0_2,
+			sdfs.newest_sp_1_2,
+			sdfs.newest_sp_0_3,
+			sdfs.newest_sp_1_3,
+			sdfs.newest_sp_2_3,	
+			sdfs.newest_sp_0_4,
+			sdfs.newest_sp_1_4,
+			sdfs.newest_sp_2_4,
+			sdfs.newest_sp_0_5,
+			sdfs.newest_sp_1_5,
+			sdfs.newest_sp_2_5,
+			sdfs.newest_sp_f_other
+		FROM sport_against_info sai
+		LEFT JOIN sport_data_fb_sp sdfs on sai.id=sdfs.sport_against_info_id
+		LEFT JOIN sport_draw_fb sdf on sai.id=sdf.sport_against_info_id
+		LEFT JOIN sport_status_fb ssf on sai.id=ssf.sport_against_info_id
+		WHERE sai.lottery_code=#{lotteryCode, jdbcType=INTEGER}
+		<choose>
+			<when test="issueCodes != null and issueCodes.size() > 0">
+				AND sai.issue_code IN 
+				<foreach collection="issueCodes" item="issueCode" open="(" separator="," close=")">
+					#{issueCode}
+				</foreach>
+			</when>
+			<otherwise>
+				AND sai.issue_code IN (
+					SELECT * FROM (
+						SELECT DISTINCT sai.issue_code
+						FROM sport_against_info sai
+						WHERE sai.lottery_code = #{lotteryCode, jdbcType=INTEGER}
+						AND sai.issue_code IS NOT NULL
+						ORDER BY sai.issue_code DESC
+						LIMIT 10
+					) t
+				)
+			</otherwise>
+		</choose>
+	</select>
+</mapper>

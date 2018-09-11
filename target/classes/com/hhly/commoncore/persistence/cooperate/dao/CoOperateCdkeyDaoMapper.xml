@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.cooperate.dao.CoOperateCdkeyDaoMapper" >
+
+	<resultMap id="CdkeyQueueBOResultMap" type="com.hhly.skeleton.lotto.base.cooperate.bo.CoOperateCdkeyQueueBO">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="over_time" property="overTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	
+	<update id="updateMyCdkey">
+		UPDATE cooperate_cdkey
+		SET my_cdkey = #{cdkeyPO.myCdkey}, stauts = #{cdkeyPO.status}, lottery_code = #{cdkeyPO.lotteryCode},
+		modify_by = #{cdkeyPO.modifyBy}, modify_time = now()
+		WHERE id IN
+			<foreach collection="cdkeyList" index="index" item="item" open="(" separator="," close=")">
+				#{item.id}
+			</foreach>
+	</update>
+	
+	<select id="findCountByMyCdkey" resultType="int">
+		SELECT count(*) FROM cooperate_cdkey cc WHERE cc.my_cdkey = #{myCdkey}
+	</select>
+	
+	<sql id="SQL_WHERE_FIND_UNALLOCATED">
+		
+	</sql>
+	
+	<select id="findUnallocatedList" resultMap="CdkeyQueueBOResultMap">
+		SELECT
+			oc.id,
+			oc.lottery_code,
+			my_cdkey,
+			oc.stauts,
+			oc.over_time
+		FROM cooperate_cdkey oc
+		WHERE oc.stauts = 2 AND ( oc.over_time IS NULL OR oc.over_time >= now() )
+	</select>
+	
+	
+	<select id="findCountForExchange" resultType="com.hhly.skeleton.lotto.base.cooperate.bo.CoOperateCdkeyCountBO">
+		SELECT
+			min(cc.my_cdkey) cdkey,
+			count(*) totalNum,
+			sum(case when cc.stauts in (1, 3) and cer.exchange_over_time<![CDATA[>=]]>now() then 1 else 0 end) canExchangeNum,
+			sum(case when cc.stauts=4 then 1 else 0 end) exchangedNum,
+			sum(case when cc.stauts=5 or cer.exchange_over_time<![CDATA[<]]>now() then 1 else 0 end) overTimeNum,
+			min(cc.lottery_code) lotteryCode,
+			cer.channel_id channelId
+		FROM cooperate_cdkey cc
+		JOIN cooperate_exchange_record cer ON cc.id = cer.cdkey_id
+		where cc.my_cdkey=#{myCdkey, jdbcType=VARCHAR}
+	</select>
+	
+	<update id="updateExchanged">
+		UPDATE cooperate_cdkey SET stauts = 4 WHERE my_cdkey = #{myCdkey, jdbcType=VARCHAR}
+	</update>
+</mapper>

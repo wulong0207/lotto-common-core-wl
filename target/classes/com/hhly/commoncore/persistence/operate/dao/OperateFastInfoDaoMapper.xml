@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.operate.dao.OperateFastInfoDaoMapper">
+
+  <resultMap type="com.hhly.skeleton.lotto.base.operate.bo.OperateFastBO" id="LottFastResultMap">
+ 	 <result column="ID" property="id" jdbcType="INTEGER" />
+ 	<result column="ONLINE_TIME" property="onlineTime" jdbcType="VARCHAR" />
+    <result column="OFFLINE_TIME" property="offlineTime" jdbcType="VARCHAR" />
+    <result column="ONLINE_WEEK" property="onlineWeek" jdbcType="SMALLINT" />
+    <result column="OFFLINE_WEEK" property="offlineWeek" jdbcType="SMALLINT" />   
+	<collection property="fastInfoList" column="id"  javaType="java.util.ArrayList" resultMap="LottFastInfoResultMap"/>
+ </resultMap>
+  <resultMap type="com.hhly.skeleton.lotto.base.operate.bo.OperateFastLottBO" id="LottFastInfoResultMap">
+ 	 <result column="TYPE_ID" property="typeId" jdbcType="INTEGER" />
+    <result column="ORDER_ID" property="orderId" jdbcType="SMALLINT" />
+    <result column="CATEGORY_ID" property="categoryId" jdbcType="SMALLINT" />
+    <result column="LOTTERY_CATEGORY" property="lotteryCategory" jdbcType="SMALLINT" />
+    <result column="LOTTERY_NAME" property="lotteryName" jdbcType="VARCHAR" />
+    <result column="LOTTERY_LOGO_URL" property="lotteryLogoUrl" jdbcType="VARCHAR" />
+    
+    <result column="FAST_ALIAS" property="fastAlias" jdbcType="VARCHAR" />
+    <result column="FAST_URL" property="fastUrl" jdbcType="VARCHAR" />
+    <result column="FAST_SELECTED" property="fastSelected" jdbcType="SMALLINT" />    
+    <result column="MULTIPLE" property="multiple" jdbcType="INTEGER" />
+    
+    <result column="ICON" property="icon" jdbcType="SMALLINT" />
+    <result column="TARGET" property="target" jdbcType="SMALLINT" />
+    <result column="TYPE_KEY" property="typeKey" jdbcType="VARCHAR" />
+    <result column="TYPE_KEY_URL" property="typeKeyUrl" jdbcType="VARCHAR" />
+    
+ </resultMap>
+  <select id="findOperFastInfo" parameterType="com.hhly.skeleton.lotto.base.operate.bo.OperateFastBO" resultMap="LottFastResultMap">
+  	 select t.id, t.ONLINE_TIME, t.OFFLINE_TIME, t.ONLINE_WEEK, t.OFFLINE_WEEK,lt.LOTTERY_LOGO_URL,lt.LOTTERY_CATEGORY,lt.LOTTERY_NAME, i.TYPE_ID, i.ORDER_ID, i.CATEGORY_ID, i.FAST_ALIAS, i.FAST_URL, i.FAST_SELECTED, i.MULTIPLE, i.ICON, i.TARGET, i.TYPE_KEY, i.TYPE_KEY_URL  
+	    from lottery_type lt  left join    OPERATE_FAST_INFO i   on lt.LOTTERY_CODE =i.TYPE_ID  left join OPERATE_FAST t on t.ID = i.FAST_ID 
+	    where t.PLATFORM =#{platform}  and t.POSITION = #{position}  and t.isDefault=#{isDefault}
+	    <if test="lotteryCode != null">
+	    	and lt.LOTTERY_CODE=#{lotteryCode}
+	    </if>
+	    and t.status=1 
+	    order by t.id,order_id
+  </select>
+</mapper>

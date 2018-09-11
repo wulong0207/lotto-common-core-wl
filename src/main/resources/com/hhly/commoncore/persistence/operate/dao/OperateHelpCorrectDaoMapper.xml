@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.commoncore.persistence.operate.dao.OperateHelpCorrectDaoMapper">
+
+	<insert id="insert" parameterType="com.hhly.commoncore.persistence.operate.po.OperateHelpCorrectPO">
+		insert into OPERATE_HELP_CORRECT(USER_ID, CUS_MOBILE, HELP_ID, HELP_TYPE_ID, SOURCES,
+			CORRECT, STATUS, TYPE, UPDATE_TIME, CREATE_BY, CREATE_TIME)
+		values(#{userId, jdbcType=INTEGER}, #{cusMobile, jdbcType=VARCHAR}, #{helpId, jdbcType=INTEGER},
+			#{helpTypeId, jdbcType=VARCHAR}, #{sources, jdbcType=VARCHAR},
+			#{correct, jdbcType=VARCHAR}, 0, #{type, jdbcType=VARCHAR}, NOW(), #{createBy, jdbcType=VARCHAR}, NOW())
+	</insert>
+	
+</mapper>

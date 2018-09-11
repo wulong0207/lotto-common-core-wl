@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.cooperate.dao.CoOperateChannelLoginLogDaoMapper" >
+	
+	<resultMap id="ChannelLoginLogPOResultMap" type="com.hhly.commoncore.persistence.cooperate.po.CoOperateChannelLoginLogPO">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="channel_id" property="channelId" jdbcType="VARCHAR"/>
+		<result column="login_time" property="loginTime" jdbcType="TIMESTAMP"/>
+		<result column="ip" property="ip" jdbcType="VARCHAR"/>
+		<result column="platform" property="platform" jdbcType="TINYINT"/>
+	</resultMap>
+	
+	<select id="findLastByChannelId" resultMap="ChannelLoginLogPOResultMap" parameterType="string">
+		SELECT
+			ccll.channel_id,
+			ccll.login_time,
+			ccll.ip,
+			ccll.platform
+		FROM cooperate_channel_login_log ccll
+		WHERE ccll.channel_id = #{channelId, jdbcType=VARCHAR}
+		ORDER by ccll.login_time DESC
+		LIMIT 1
+	</select>
+	
+	<insert id="insert" parameterType="com.hhly.commoncore.persistence.cooperate.po.CoOperateChannelLoginLogPO">
+		INSERT INTO cooperate_channel_login_log (
+			channel_id,
+			login_time,
+			ip,
+			platform
+		) VALUES (
+			#{channelId, jdbcType=VARCHAR},
+			now(),
+			#{ip, jdbcType=VARCHAR},
+			#{platform, jdbcType=TINYINT}
+		)
+	</insert>
+</mapper>

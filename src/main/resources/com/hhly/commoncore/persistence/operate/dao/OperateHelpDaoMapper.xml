@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.operate.dao.OperateHelpDaoMapper">
+	
+	<resultMap id="HelpBOResultMap" type="com.hhly.skeleton.lotto.base.operate.bo.OperateHelpBO">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="title" property="title" jdbcType="VARCHAR"/>
+		<result column="label" property="label" jdbcType="VARCHAR"/>
+		<result column="summary" property="summary" jdbcType="VARCHAR"/>
+		<result column="type_code" property="typeCode" jdbcType="VARCHAR"/>
+		<result column="type_name" property="typeName" jdbcType="VARCHAR"/>
+		<result column="content" property="content" jdbcType="VARCHAR"/>
+		<result column="audio"  property="audio" jdbcType="VARCHAR"/>
+		<result column="contains_audio" property="containsAudio" jdbcType="INTEGER"/>
+		<result column="able_percent" property="ablePercent" jdbcType="INTEGER"/>
+	</resultMap>
+	
+	<select id="findKeyword" resultType="java.lang.String" parameterType="java.lang.String">
+		<bind name="_keyword" value="'%' + keyword + '%'" />
+		SELECT DISTINCT keyword FROM (
+			SELECT oh.title keyword FROM operate_help oh
+			<include refid="BASE_SQL_WHERE"></include> AND oh.title LIKE #{_keyword, jdbcType=VARCHAR}
+			UNION 
+			SELECT oht.full_name keyword FROM operate_help_type oht
+			WHERE oht.full_name LIKE #{_keyword, jdbcType=VARCHAR} AND oht.isvirtual=0 AND status=1
+		) tmp
+	</select>
+	
+	<sql id="BASE_SQL_WHERE">
+		WHERE oh.status=3 AND oh.release_time<![CDATA[<]]>NOW()
+		<choose>
+			<when test="platform != null and platform == 1">
+				AND oh.web = 1
+			</when>
+			<when test="platform != null and platform == 2">
+				AND oh.wap = 1
+			</when>
+			<when test="platform != null and platform == 3">
+				AND oh.android = 1
+			</when>
+			<when test="platform != null and platform == 4">
+				AND oh.ios = 1
+			</when>
+			<otherwise>
+				AND oh.web = 1
+			</otherwise>
+		</choose>
+	</sql>
+	
+	<sql id="SQL_WHERE_SEARCH">
+		<include refid="BASE_SQL_WHERE"></include>
+		AND (oh.title like #{_keyword, jdbcType=VARCHAR} OR oh.label like #{_keyword, jdbcType=VARCHAR} OR oht.full_name like #{_keyword, jdbcType=VARCHAR})
+	</sql>
+	
+	<select id="searchTotal" resultType="int" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateHelpVO">
+		<bind name="_keyword" value="'%' + _parameter.getKeyword() + '%'" />
+		SELECT count(*)
+		FROM operate_help oh JOIN operate_help_type oht ON oh.type_id = oht.id
+		<include refid="SQL_WHERE_SEARCH"></include>
+	</select>
+	
+	<select id="search" resultMap="HelpBOResultMap" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateHelpVO">
+		<bind name="_keyword" value="'%' + _parameter.getKeyword() + '%'" />
+		SELECT oh.id, oh.title, oh.label, oh.summary, oht.code type_code, oht.full_name type_name,
+			(case when oh.audio is null or oh.audio = '' then 0 else 1 end) contains_audio,
+			truncate(100*ifnull(ifnull(oh.able, 0)/(ifnull(oh.able, 0)+ifnull(oh.unable, 0)),1), 0) able_percent,
+			((length(oh.title)-length(replace(oh.title, #{keyword, jdbcType=VARCHAR}, ''))) +
+			(length(oh.label) - length(replace(oh.label, #{keyword, jdbcType=VARCHAR}, '')))) num
+		FROM operate_help oh JOIN operate_help_type oht ON oh.type_id = oht.id
+		<include refid="SQL_WHERE_SEARCH"></include>
+		ORDER BY num DESC, oh.release_time DESC, oh.create_time DESC
+		<if test="startRow != null and pageSize != null">
+			LIMIT #{startRow} , #{pageSize}
+		</if>
+	</select>
+	
+	<sql id="SQL_WHERE_FIND_BYTYPE">
+		<include refid="BASE_SQL_WHERE"></include>
+		<choose>
+			<when test="typeCode != null and typeCode != ''">
+				AND oht.code=#{typeCode, jdbcType=VARCHAR}
+			</when>
+			<otherwise>
+				AND oh.type_id=top.type_id
+			</otherwise>
+		</choose>
+		<if test="outHelpId != null and outHelpId != ''">
+			AND oh.id != #{outHelpId, jdbcType=INTEGER}
+		</if>
+	</sql>
+	
+	<select id="findTotal" resultType="int" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateHelpVO">
+		SELECT COUNT(*) 
+		FROM operate_help oh JOIN operate_help_top top ON oh.id=top.help_id
+		JOIN operate_help_type oht ON top.type_id = oht.id
+		<include refid="SQL_WHERE_FIND_BYTYPE"></include>
+	</select>
+	
+	<select id="findList" resultMap="HelpBOResultMap" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateHelpVO">
+		SELECT oh.id, top.title, oh.label, 
+			(case when oh.audio is null or oh.audio = '' then 0 else 1 end) contains_audio,
+			truncate(100*ifnull(ifnull(oh.able, 0)/(ifnull(oh.able, 0)+ifnull(oh.unable, 0)),1), 0) able_percent
+		FROM operate_help oh JOIN operate_help_top top ON oh.id=top.help_id
+		JOIN operate_help_type oht ON top.type_id = oht.id
+		<include refid="SQL_WHERE_FIND_BYTYPE"></include>
+		ORDER BY oh.release_time DESC
+		<if test="startRow != null and pageSize != null">
+			LIMIT #{startRow} , #{pageSize}
+		</if>
+	</select>
+	
+	<select id="findById" resultMap="HelpBOResultMap" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateHelpVO">
+		SELECT oh.id, oh.title, oh.label, oh.summary, oh.content, oh.audio, oht.code type_code, oht.full_name type_name,
+			truncate(100*ifnull(ifnull(oh.able, 0)/(ifnull(oh.able, 0)+ifnull(oh.unable, 0)),1), 0) able_percent
+		FROM operate_help oh JOIN operate_help_type oht ON oh.type_id=oht.id
+		<include refid="BASE_SQL_WHERE"></include>
+		AND oh.id=#{id, jdbcType=INTEGER}
+	</select>
+	
+	<select id="findLabelListByType" resultType="string" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateHelpVO">
+		SELECT DISTINCT oh.label
+		FROM operate_help oh JOIN operate_help_top top ON oh.id=top.help_id
+		JOIN operate_help_type oht ON top.type_id = oht.id
+		<include refid="SQL_WHERE_FIND_BYTYPE"></include>
+		AND oh.label is not null
+		ORDER BY oh.release_time DESC
+		<if test="pageSize != null">
+			LIMIT #{pageSize}
+		</if>
+	</select>
+	
+	<select id="findLabelListByKeyword" resultType="string" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateHelpVO">
+		<bind name="_keyword" value="'%' + _parameter.getKeyword() + '%'" />
+		SELECT oh.label,
+			((length(oh.title)-length(replace(oh.title, #{keyword, jdbcType=VARCHAR}, ''))) +
+			(length(oh.label) - length(replace(oh.label, #{keyword, jdbcType=VARCHAR}, '')))) num
+		FROM operate_help oh JOIN operate_help_type oht ON oh.type_id = oht.id
+		<include refid="SQL_WHERE_SEARCH"></include>
+		AND oh.label is not null
+		ORDER BY num DESC, oh.release_time DESC, oh.create_time DESC
+		<if test="pageSize != null">
+			LIMIT #{pageSize}
+		</if>
+	</select>
+
+	<select id="findByTypeCode" resultMap="HelpBOResultMap" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateHelpVO">
+		SELECT oh.id, top.title, oh.label, oh.summary, oh.content, oh.audio, oht.code type_code, oht.full_name type_name,
+			truncate(100*ifnull(ifnull(oh.able, 0)/(ifnull(oh.able, 0)+ifnull(oh.unable, 0)),1), 0) able_percent
+		FROM operate_help oh JOIN operate_help_top top ON oh.id=top.help_id
+		JOIN operate_help_type oht ON top.type_id = oht.id
+		<include refid="SQL_WHERE_FIND_BYTYPE"></include>
+		ORDER BY oh.release_time DESC
+		LIMIT 1
+	</select>
+	
+	<update id="updateHelpAble">
+		UPDATE operate_help SET 
+		<choose>
+			<when test="isAble == 1">
+				able=ifnull(able, 0)+1
+			</when>
+			<otherwise>
+				unable=ifnull(unable, 0)+1
+			</otherwise>
+		</choose>
+		WHERE id=#{id, jdbcType=INTEGER}
+	</update>
+	
+</mapper>

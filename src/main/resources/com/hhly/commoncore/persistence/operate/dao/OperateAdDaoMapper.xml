@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.operate.dao.OperateAdDaoMapper">
+  
+  <resultMap id="OperateAdLottoBO" type="com.hhly.skeleton.lotto.base.operate.bo.OperateAdLottoBO" >
+    <result column="ADV_TITLE" property="advTitle" jdbcType="VARCHAR" />
+    <result column="POSITION" property="position" jdbcType="SMALLINT" />
+    <result column="POSITION_CODE" property="positionCode" jdbcType="VARCHAR" />
+    <result column="POSITION_INFO" property="positionInfo" jdbcType="VARCHAR" />
+    <result column="TARGET" property="target" jdbcType="SMALLINT" />
+    <result column="URL" property="adUrl" jdbcType="VARCHAR" />
+    <result column="IMG" property="adImgUrl" jdbcType="VARCHAR" />
+    <result column="DISPLAY" property="display" jdbcType="SMALLINT" />
+    <result column="LOTTERY_CODE" property="lotteryCode" jdbcType="INTEGER" />
+     <result column="id" property="id" jdbcType="INTEGER" />
+  </resultMap>
+  
+	<sql id="CompleCode_Sql">
+		select <include refid="lotto_Column_List"/> from OPERATE_ADV oa 
+		LEFT JOIN operate_adv_Type ou  ON oa.id       = ou.ADV_ID
+		LEFT JOIN M_USER_TYPE mut  ON ou.M_TYPE_ID    =  mut.TYPE_ID 
+		where MENU=#{menu} and mut.USER_ID = #{userId} and  ou.CHANNEL_ID  =  #{channelId} and  find_in_set(oa.PLATFORM, #{platform})
+		and now() between oa.ONLINE_TIME and oa.OFFLINE_TIME
+		and oa.status=1
+		and oa.ISDEFAULT = 0
+		union
+		
+		select <include refid="lotto_Column_List"/> from OPERATE_ADV oa 
+		LEFT JOIN operate_adv_Type ou  ON oa.id       = ou.ADV_ID
+		LEFT JOIN M_USER_INFO mui  ON ou.CHANNEL_ID    =  mui.CHANNEL_ID 
+		where  MENU=#{menu} and  mui.ID  = #{userId} and  ou.CHANNEL_ID  =  #{channelId} and  find_in_set(oa.PLATFORM, #{platform})
+		and now() between ONLINE_TIME and OFFLINE_TIME
+		and oa.status=1
+		and oa.ISDEFAULT = 0		
+	</sql>
+	
+	<sql id="lotto_Column_List" >
+	   ADV_TITLE, POSITION, POSITION_CODE, POSITION_INFO, 
+	   TARGET, URL, IMG,DISPLAY,order_id,LOTTERY_CODE,oa.id
+  	</sql>
+	<select id="findHomeOperAd" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateAdVO" resultMap="OperateAdLottoBO">
+    	 select <include refid="lotto_Column_List"/> from OPERATE_ADV oa 
+    	  LEFT JOIN operate_adv_Type ou  ON oa.id       = ou.ADV_ID		
+    	  where  MENU=#{menu} and  ou.CHANNEL_ID  =  #{channelId} and  find_in_set(oa.PLATFORM, #{platform})
+    	  AND ou.M_TYPE_ID  = 0
+		  and oa.ISDEFAULT = 0
+    	  and now() between oa.ONLINE_TIME and oa.OFFLINE_TIME and oa.status=1  	  
+     	<if test="userId != null">
+   		   union   		     		   
+   		  <include refid="CompleCode_Sql"/>
+ 	  	</if>
+ 	  	order by order_id			
+  </select>
+    <!-- 查询默认广告数据 -->
+	<select id="findDefaultAd" resultMap="OperateAdLottoBO">
+    	 select <include refid="lotto_Column_List"/> from OPERATE_ADV oa 	
+    	  LEFT JOIN operate_adv_Type ou  ON oa.id       = ou.ADV_ID	
+    	  where  MENU=#{menu}  and  ou.CHANNEL_ID  =  #{channelId} and  find_in_set(oa.PLATFORM, #{platform})
+    	  and ISDEFAULT = 1
+    	  and now() between ONLINE_TIME and OFFLINE_TIME and oa.status=1
+    	  order by order_id			
+  </select>
+</mapper>

@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.commoncore.persistence.lottery.dao.LotteryTypeDaoMapper">
+
+	<!--                           Used to LOTTO                           -->
+	<!-- sql结果集：前端接口：彩种  -->
+	<resultMap id="LotteryFrontResultMap" type="com.hhly.skeleton.lotto.base.lottery.bo.LotteryBO">
+		<result property="lotteryCode" column="lottery_code" jdbcType="INTEGER"/>
+  	  	<result property="lotteryName" column="lottery_name" jdbcType="VARCHAR"/>
+  	  	<result property="lotteryLogoUrl" column="lottery_logo_url" jdbcType="VARCHAR"/>
+  	  	<result property="saleStatus" column="sale_status" jdbcType="SMALLINT"/>
+  	  	<result property="drawTime" column="draw_time" jdbcType="VARCHAR"/>
+  	  	<result property="vacations" column="vacations" jdbcType="VARCHAR"/>
+  	  	<result property="startSailTime" column="start_sail_time" jdbcType="VARCHAR"/>
+  	  	<result property="endSaleTime" column="end_sail_time" jdbcType="VARCHAR"/>
+  	  	<result property="endCheckTime" column="end_check_time" jdbcType="VARCHAR"/>
+  	  	<result property="sailDayCycle" column="sail_day_cycle" jdbcType="VARCHAR"/>
+        <result property="buyEndTime" column="buy_end_time" jdbcType="DECIMAL"/>
+        <result property="platform" column="platform" jdbcType="VARCHAR"/>
+	</resultMap>
+	<!-- 前端接口：查询单个彩种 -->
+	<select id="findSingleFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultMap="LotteryFrontResultMap">
+		select lottery_code,
+		       lottery_name,
+		       lottery_logo_url,
+		       sale_status,
+		       draw_time,
+		       vacations,
+		       start_sail_time,
+		       end_sail_time,
+		       end_check_time,
+        	   sail_day_cycle,
+        	   buy_end_time,
+       		   platform
+		  from LOTTERY_TYPE lt
+		 where lt.lottery_code = #{lotteryCode,jdbcType=VARCHAR}
+	</select>
+	<!-- 前端接口： 查询所有大彩种 -->
+	<select id="findMultipleFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.lottery.bo.LotteryBO">
+	     select lottery_code lotteryCode,
+		       lottery_name lotteryName,
+		       lottery_logo_url lotteryLogoUrl,
+		       sale_status saleStatus,
+		       draw_time drawTime,
+		       vacations 
+		  from LOTTERY_TYPE lt
+	</select>
+	<select id="findTypeUseAddIssue" resultType="com.hhly.skeleton.base.issue.entity.NewTypeBO">
+		select
+		ID,
+		ADMIN_CATEGORY  adminCategory,
+		START_SAIL_TIME startSailTime,
+		END_SAIL_TIME endSailTime,
+		SAIL_DAY_CYCLE sailDayCycle,
+		VACATIONS vacations,
+		LOTTERY_CODE lotteryCode,
+		LOTTERY_NAME lotteryName,
+		CON_ISSUE_NUM conIssueNum,
+		STOP_ADD_ISSUE stopAddIssue,
+		LOTTERY_CATEGORY lotteryCategory,
+		SALE_STATUS saleStatus,
+		SYN_ISSUE synIssue,
+		SALE_TIME saleTime,
+		BUY_END_TIME buyEndTime,
+		END_CHECK_TIME endCheckTime,
+		DRAW_TIME DRAWTIME,
+		format
+		from LOTTERY_TYPE
+		where LOTTERY_CODE = #{lotteryCode}
+	</select>
+	<!-- 前端接口： 查询彩种信息-->
+	<select id="findAllLotteryType" resultType="com.hhly.skeleton.lotto.base.lottery.bo.LotteryTypeBO">
+	     select lottery_code lotteryCode,
+		       lottery_name lotteryName,
+		       lottery_logo_url lotteryLogoUrl,
+		       end_sail_time endSailTime,
+		       SAIL_DAY_CYCLE sailDayCycle,
+		       buy_end_time buyEndTime
+		  from LOTTERY_TYPE
+	</select>
+	
+	<!-- 前端接口: 查询彩种下拉基本信息 -->
+  <select id="queryLotterySelectList" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" 
+   resultType="com.hhly.skeleton.lotto.base.lottery.bo.LotteryBO">
+   		select lottery_code lotteryCode, lottery_name lotteryName
+   		from lottery_type
+   		<where>
+   			1=1
+   			<if test="drawType != null">
+   				<choose>
+   					<when test="drawType == 1">
+   						and lottery_category in (1, 3)
+   					</when>
+   					<when test="drawType == 2">
+   						and lottery_category = 2
+   					</when>
+   					<when test="drawType == 3">
+   						and lottery_category = 4
+   					</when>
+   				</choose>
+   			</if>
+   		</where>
+   		order by order_id, lottery_code
+   </select>
+
+	<select id="findLotteryLastest" resultType="com.hhly.skeleton.lotto.base.lottery.bo.LotteryDetailBO">
+		SELECT
+			jackpot_amount jackpotAmount
+		FROM
+			lottery_issue
+		WHERE
+			issue_lastest = 1 AND lottery_code = #{lotteryCode, jdbcType=INTEGER}
+	</select>
+
+	<select id="findLotteryList" resultType="com.hhly.skeleton.lotto.base.lottery.bo.LotteryDetailBO">
+		SELECT
+			ol.platform,
+			ol.isdefault,
+			oli.type_alias typeAlias,
+			oli.type_url typeUrl,
+			oli.icon icon,
+			oli.type_key typeKey,
+			oli.type_key_url typeKeyUrl,
+			oli.type_id typeId,
+			oli.url url,
+			oli.lottery_describe lotteryIntro,
+			ltp.lottery_logo_url lotteryLogoUrl,
+			ltp.lottery_category categoryId,
+			ltp.sail_day_cycle sailDatCycle,
+			li.id id,
+			li.lottery_time lotteryTime,
+			li.issue_code issueCode,
+			li.lottery_code lotteryCode,
+			li.lottery_name lotteryName,
+			li.current_issue currentIssue,
+			li.draw_code drawCode,
+			li.sale_status saleStatus
+		FROM
+			operate_lottery ol
+			LEFT JOIN operate_lottery_info oli ON ol.id = oli.lottery_id
+			LEFT JOIN lottery_type ltp ON oli.type_id = ltp.lottery_code
+			LEFT JOIN lottery_issue li ON li.lottery_code = ltp.lottery_code
+		WHERE
+		(ltp.sale_status = 1 OR (ltp.sale_status = 0 AND ltp.platform NOT LIKE '%1%'))
+		AND li.current_issue = 1
+		AND ol.platform = 1
+		AND ol. STATUS = 1
+		AND ol.isdefault = 0
+		AND oli.lottery_child_code IS NULL
+		ORDER BY
+			oli.order_id
+		<choose>
+			<when test="defaultAd == 0">
+				LIMIT 4,21
+			</when>
+			<when test="defaultAd == 1">
+				LIMIT 0,4
+			</when>
+		</choose>
+	</select>
+
+	<select id="findLotteryDefaultList" resultType="com.hhly.skeleton.lotto.base.lottery.bo.LotteryDetailBO">
+		SELECT
+			ol.platform,
+			ol.isdefault,
+			oli.type_alias typeAlias,
+			oli.type_url typeUrl,
+			oli.icon icon,
+			oli.type_key typeKey,
+			oli.type_key_url typeKeyUrl,
+			oli.type_id typeId,
+			oli.url url,
+			oli.lottery_describe lotteryIntro,
+			ltp.lottery_logo_url lotteryLogoUrl,
+			ltp.lottery_category categoryId,
+			ltp.sail_day_cycle sailDatCycle,
+			li.id id,
+			li.lottery_time lotteryTime,
+			li.issue_code issueCode,
+			li.lottery_code lotteryCode,
+			li.lottery_name lotteryName,
+			li.jackpot_amount jackpotAmount,
+			li.current_issue currentIssue,
+			li.draw_code drawCode,
+			li.sale_status saleStatus
+		FROM
+			operate_lottery ol
+		LEFT JOIN operate_lottery_info oli ON ol.id = oli.lottery_id
+		LEFT JOIN lottery_type ltp ON oli.type_id = ltp.lottery_code
+		LEFT JOIN lottery_issue li ON li.lottery_code = ltp.lottery_code
+		WHERE
+		(ltp.sale_status = 1 OR (ltp.sale_status = 0 AND ltp.platform NOT LIKE '%1%'))
+		AND li.current_issue = 1
+		AND ol.platform = 1
+		AND ol. STATUS = 1
+		AND ol.isdefault = 1
+		AND oli.lottery_child_code IS NULL
+		ORDER BY
+		oli.order_id
+		<choose>
+			<when test="defaultAd == 0">
+				LIMIT 4,21
+			</when>
+			<when test="defaultAd == 1">
+				LIMIT 0,4
+			</when>
+		</choose>
+	</select>
+
+	<select id="findLotteryDrawList" resultType="com.hhly.skeleton.lotto.base.lottery.bo.LotteryDetailBO">
+		SELECT
+			t.*,
+			lt.lottery_logo_url lotteryLogoUrl,
+			lt.lottery_category categoryId
+		FROM (
+			SELECT
+				li.lottery_time lotteryTime,
+				li.lottery_code lotteryCode,
+				issue_code issueCode,
+				sale_end_time saleEndTime,
+				lottery_name lotteryName,
+				hs.*
+			FROM lottery_issue li
+			, (
+				SELECT
+					issue_code preIssueCode,
+					lottery_time preLotteryTime,
+					draw_code preDrawCode,
+					draw_code_test drawCodeTest,
+					jackpot_amount preJackpotAmount,
+					draw_detail preDrawDetail,
+					lottery_code
+				FROM lottery_issue WHERE issue_lastest =1) hs
+			WHERE current_issue =1  and li.lottery_code  = hs. lottery_code) t
+		LEFT JOIN	lottery_type lt ON lt.lottery_code	= t.lotteryCode order by lt.order_id,lt.id
+	</select>
+
+	<select id="findSportBetNum" resultType="java.lang.Integer">
+		SELECT
+			COUNT(1)
+		FROM
+			sport_against_info sai
+		JOIN sport_team_info stih ON sai.home_team_id = stih.id
+		JOIN sport_team_info stig ON sai.visiti_team_id = stig.id
+		JOIN sport_match_info smi ON sai.sport_match_info_id = smi.id
+		WHERE
+			sai.lottery_code = #{lotteryCode, jdbcType=INTEGER}
+		AND sai.match_status = 9
+		AND sai.sale_end_time > now()
+	</select>
+
+	<select id="findLotterySalesIssue" resultType="java.lang.Integer">
+		SELECT count(1) FROM lottery_issue i LEFT JOIN lottery_type t ON i.lottery_code = t.lottery_code
+		WHERE t.lottery_category = 2 AND i.current_issue IN (2,3)
+		<if test="lotteryCode != null and lotteryCode != ''">
+			AND i.lottery_code = #{lotteryCode}
+		</if>
+		<![CDATA[
+           AND i.create_time> curdate()  and i.create_time< date_add(curdate(),INTERVAL +1 DAY )
+        ]]>
+	</select>
+	
+</mapper>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.operate.dao.OperateMarketChannelDaoMapper">
+
+	<resultMap id="ChannelBOResultMap" type="com.hhly.skeleton.lotto.base.operate.bo.OperateMarketChannelBO">
+		<result column="channel_id" property="channelId" jdbcType="VARCHAR"/>
+		<result column="channel_name" property="channelName" jdbcType="VARCHAR"/>
+		<result column="coop_start_time" property="coopStartTime" jdbcType="TIMESTAMP"/>
+		<result column="coop_end_time" property="coopEndTime" jdbcType="TIMESTAMP"/>
+		<result column="channel_status" property="channelStatus" jdbcType="TINYINT"/>
+		<result column="secret_key" property="key" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		ID, CHANNEL_ID, CHANNEL_NAME, TERMINAL_PLATFORM, PARENT_CHANNEL_ID,
+		GRADE, SETTLEMENT_TYPE,
+		RESOURCE_URL, SETTLEMENT_RATE, COOP_START_TIME, COOP_END_TIME, CHANNEL_STATUS,
+		MODIFY_TIME,
+		MODIFY_BY, CREATE_BY, UPDATE_TIME, CREATE_TIME, REMARK,RESOURCE_NAME
+	</sql>
+
+	<sql id="Column_List">
+		ID,
+		CHANNEL_ID CHANNELID,
+		CHANNEL_NAME CHANNELNAME,
+		TERMINAL_PLATFORM TERMINALPLATFORM,
+		PARENT_CHANNEL_ID PARENTCHANNELID,
+		GRADE,
+		SETTLEMENT_TYPE SETTLEMENTTYPE,
+		RESOURCE_URL RESOURCEURL,
+		SETTLEMENT_RATE SETTLEMENTRATE,
+		COOP_START_TIME COOPSTARTTIME,
+		COOP_END_TIME COOPENDTIME,
+		CHANNEL_STATUS CHANNELSTATUS,
+		MODIFY_TIME MODIFYTIME,
+		MODIFY_BY MODIFYBY,
+		CREATE_BY CREATEBY,
+		UPDATE_TIME UPDATETIME,
+		CREATE_TIME CREATETIME,
+		REMARK,
+		RESOURCE_NAME RESOURCENAME
+	</sql>
+	<sql id="sql_condition_OperateMarketChannelVO">
+		<where>
+			<if test="channelId!=null and channelId!=''">
+				and CHANNEL_ID = #{channelId}
+			</if>
+			<if test="channelName!=null and channelName!=''">
+				and channel_Name = #{channelName}
+			</if>
+			<if test="parentChannelId!=null and parentChannelId!=''">
+				and parent_Channel_Id = #{parentChannelId}
+			</if>
+			<if test="grade!=null">
+				and grade = #{grade}
+			</if>
+			<if test="terminalPlatform !=null">
+				and terminal_Platform = #{terminalPlatform}
+			</if>
+			<if test="settlementType!=null">
+				and settlement_Type = #{settlementType}
+			</if>
+	        <if test="coopStartTime !=null">
+				and COOP_START_TIME >= #{coopStartTime}
+			</if>
+			<if test="coopEndTime!=null">
+				and coop_End_Time <![CDATA[<=]]>#{coopEndTime}
+			</if>
+			
+			<if test="createStartTime !=null">
+				and CREATE_TIME >= #{createStartTime}
+			</if>
+			<if test="createEndTime!=null">
+				and CREATE_TIME <![CDATA[<=]]>#{createEndTime}
+			</if>
+			<if test="updateStartTime !=null">
+				and UPDATE_TIME >= #{updateStartTime}
+			</if>
+			<if test="updateEndTime!=null">
+				and UPDATE_TIME <![CDATA[<=]]>#{updateEndTime}
+			</if>
+			<if test="appUrlLike!=null and appUrlLike!=''">
+				and app_url like concat('%', #{appUrlLike})
+			</if>
+		</where>
+	</sql>
+
+	<select id="findVersionByChannel" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateLottSoftwareVersionVO" resultType="com.hhly.skeleton.lotto.base.operate.bo.OperateLottSoftwareVersionBO">
+  	  select APP_URL wapAppUrl 	  
+  	  from operate_market_channel
+  	  where CHANNEL_ID = #{channelId}
+  </select>
+  
+  <select id="findByChannelId" resultMap="ChannelBOResultMap" parameterType="string">
+  	SELECT
+		omc.channel_id,
+		omc.channel_name,
+		omc.channel_status,
+		omc.coop_start_time,
+		omc.coop_end_time,
+		omc.secret_key
+	FROM operate_market_channel omc
+	WHERE omc.channel_id = #{channelId,jdbcType=VARCHAR}
+  </select>
+</mapper>

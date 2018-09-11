@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.sport.dao.SportMatchInfoDaoMapper" >
+
+	<resultMap id="MatchResultBO" type="com.hhly.skeleton.lotto.base.sport.bo.MatchDataBO">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="match_name" property="matchName" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<select id="findRaceList" resultMap="MatchResultBO">
+		SELECT smi.id ,(case 
+			when smi.match_short_name is null or smi.match_short_name='' then smi.match_full_name
+			else smi.match_short_name end
+			) match_name
+		FROM sport_match_info smi
+		WHERE smi.id in (
+			SELECT sai.sport_match_info_id FROM sport_against_info sai WHERE sai.lottery_code=#{lotteryCode, jdbcType=INTEGER}
+		)
+	</select>
+</mapper>

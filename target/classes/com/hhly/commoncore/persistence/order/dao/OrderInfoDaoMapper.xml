@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.order.dao.OrderInfoDaoMapper" >
+	
+	<resultMap id="ProxyOrderBOResultMap" type="com.hhly.skeleton.lotto.base.cooperate.bo.CoOperateProxyOrderBO">
+		<result column="trans_code" property="transCode" jdbcType="VARCHAR"/>
+		<result column="trans_type" property="transType" jdbcType="TINYINT"/>
+		<result column="order_info" property="orderInfo" jdbcType="VARCHAR"/>
+		<result column="order_code" property="orderCode" jdbcType="VARCHAR"/>
+		<result column="order_amount" property="orderAmount" jdbcType="DECIMAL"/>
+		<result column="buy_type" property="buyType" jdbcType="TINYINT"/>
+		<result column="pay_status" property="payStatus" jdbcType="TINYINT"/>
+		<result column="order_status" property="orderStatus" jdbcType="TINYINT"/>
+		<result column="winning_status" property="winningStatus" jdbcType="TINYINT"/>
+		<result column="add_status" property="addStatus" jdbcType="TINYINT"/>
+		<result column="cash_amount" property="cashAmount" jdbcType="DECIMAL"/>
+		<result column="red_trans_amount" property="redTransAmount" jdbcType="DECIMAL"/>
+		<result column="pre_bonus" property="preBonus" jdbcType="DECIMAL"/>
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="trans_time" property="transTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+
+	<!--查询用户中奖信息集合-->
+	<select id="queryUserWinInfo" resultType="com.hhly.skeleton.lotto.base.order.bo.UserWinInfoBO">
+		SELECT
+			oi.lottery_code lotteryCode,
+			oi.lottery_name lotteryName,
+			oi.pre_bonus preBonus,
+			(SELECT nick_name FROM m_user_info m WHERE m.ID = oi.user_id) nickname
+		FROM order_info oi WHERE winning_status IN (3,4) AND order_status = 6 ORDER BY create_time DESC LIMIT 100
+	</select>
+	
+	<sql id="SQL_FROM_WHERE_FIND_ORDER_LIST_BY_PROXY_GROBAL">
+		<if test="transCode != null and transCode != ''">
+			AND tu.trans_code = #{transCode}
+		</if>
+		<choose>
+			<when test="payType == null or payType == 0">
+			</when>
+			<when test="payType == 1">
+				AND tu.cash_amount <![CDATA[>]]> 0
+				AND tu.red_trans_amount <![CDATA[>]]> 0
+			</when>
+			<when test="payType == 2">
+				AND tu.cash_amount <![CDATA[>]]> 0
+				AND tu.red_trans_amount = 0
+			</when>
+			<when test="payType == 3">
+				AND tu.cash_amount = 0
+				AND tu.red_trans_amount <![CDATA[>]]> 0
+			</when>
+			<otherwise>
+				AND 1=2
+			</otherwise>
+		</choose>
+	</sql>
+	
+	<sql id="SQL_FROM_WHERE_FIND_ORDER_LIST_BY_PROXY_FOR_ORDER">
+		FROM order_info oi JOIN trans_user tu ON oi.order_code=tu.order_code
+		WHERE oi.buy_type = 1 AND oi.pay_status=2 AND tu.trans_type = 2 AND tu.trans_status = 1
+		AND oi.order_status = 6
+		AND oi.channel_id = #{queryChannelId, jdbcType=VARCHAR}
+		<if test="startTime != null">
+			AND oi.come_out_time <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="endTime != null">
+			AND oi.come_out_time <![CDATA[<=]]> #{endTime}
+		</if>
+		<choose>
+			<when test="status == null or status == 0">
+			</when>
+			<when test="status == 3">
+				AND oi.winning_status = 1
+			</when>
+			<when test="status == 4">
+				AND oi.winning_status in (3, 4)
+			</when>
+			<when test="status == 5">
+				AND oi.winning_status = 2
+			</when>
+			<otherwise>
+				AND 1 = 2
+			</otherwise>
+		</choose>
+		<include refid="SQL_FROM_WHERE_FIND_ORDER_LIST_BY_PROXY_GROBAL"></include>
+	</sql>
+	
+	<sql id="SQL_FROM_WHERE_FIND_ORDER_LIST_BY_PROXY_FOR_ADDORDER">
+		FROM order_added oa join trans_user tu on oa.order_add_code=tu.order_code
+		WHERE oa.pay_status=2 AND tu.trans_type=2 AND tu.trans_status = 1
+		AND oa.channel_id = #{queryChannelId, jdbcType=VARCHAR}
+		<if test="startTime != null">
+			AND oa.create_time <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="endTime != null">
+			AND oa.create_time <![CDATA[<=]]> #{endTime}
+		</if>
+		<choose>
+			<when test="status == null or status == 0">
+			</when>
+			<when test="status == 4">
+				AND oa.add_status = 2
+			</when>
+			<when test="status == 5">
+				AND oa.add_status = 3
+			</when>
+			<when test="status == 6">
+				AND oa.add_status = 1
+			</when>
+			<when test="status == 7">
+				AND oa.add_status = 4
+			</when>
+			<when test="status == 8">
+				AND oa.add_status = 5
+			</when>
+			<otherwise>
+				AND 1 = 2
+			</otherwise>
+		</choose>
+		<include refid="SQL_FROM_WHERE_FIND_ORDER_LIST_BY_PROXY_GROBAL"></include>
+	</sql>
+	
+	<sql id="SQL_FROM_WHERE_FIND_ORDER_LIST_BY_PROXY_FOR_GROUP">
+		FROM order_info oi join order_group_content ogc on oi.order_code=ogc.order_code
+		join trans_user tu on ogc.buy_code=tu.order_code
+		WHERE oi.buy_type = 3 AND oi.pay_status=2 AND tu.trans_type=2 AND tu.trans_status = 1
+		AND oi.order_status = 6
+		AND tu.channel_id = #{queryChannelId, jdbcType=VARCHAR}
+		<if test="companyUserId != null">
+			AND tu.user_id != #{companyUserId}
+		</if>
+		<if test="startTime != null">
+			AND oi.come_out_time <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="endTime != null">
+			AND oi.come_out_time <![CDATA[<=]]> #{endTime}
+		</if>
+		<choose>
+			<when test="status == null or status == 0">
+			</when>
+			<when test="status == 3">
+				AND oi.winning_status = 1
+			</when>
+			<when test="status == 4">
+				AND oi.winning_status in (3, 4)
+			</when>
+			<when test="status == 5">
+				AND oi.winning_status = 2
+			</when>
+			<otherwise>
+				AND 1 = 2
+			</otherwise>
+		</choose>
+		<include refid="SQL_FROM_WHERE_FIND_ORDER_LIST_BY_PROXY_GROBAL"></include>
+	</sql>
+	
+	<select id="findOrderTotalByProxy" resultType="int" parameterType="com.hhly.skeleton.lotto.base.cooperate.vo.CoOperateProxyOrderVO">
+		SELECT count(*) FROM (
+			SELECT oi.order_code 
+			<include refid="SQL_FROM_WHERE_FIND_ORDER_LIST_BY_PROXY_FOR_ORDER"></include>
+			UNION ALL
+			SELECT oa.order_add_code order_code
+			<include refid="SQL_FROM_WHERE_FIND_ORDER_LIST_BY_PROXY_FOR_ADDORDER"></include>
+			UNION ALL
+			SELECT ogc.buy_code
+			<include refid="SQL_FROM_WHERE_FIND_ORDER_LIST_BY_PROXY_FOR_GROUP"></include>
+		) tmp
+	</select>
+	
+	<select id="findOrderListByProxy" resultMap="ProxyOrderBOResultMap" parameterType="com.hhly.skeleton.lotto.base.cooperate.vo.CoOperateProxyOrderVO">
+		SELECT * FROM (
+			SELECT * FROM (
+				SELECT tu.trans_code, tu.trans_type, concat(oi.lottery_name, '代购|', oi.lottery_issue, '期') order_info, 
+					oi.buy_type, oi.order_code, oi.order_amount, 
+					oi.pay_status, oi.order_status, oi.winning_status, 0 add_status,
+					tu.cash_amount, tu.red_trans_amount,
+					oi.pre_bonus, oi.create_time, oi.come_out_time trans_time 
+				<include refid="SQL_FROM_WHERE_FIND_ORDER_LIST_BY_PROXY_FOR_ORDER"></include>
+				ORDER BY oi.come_out_time DESC
+				<if test="endRow != null">
+					LIMIT #{endRow}
+				</if>
+			) t1
+			UNION ALL
+			SELECT * FROM (
+				SELECT tu.trans_code, tu.trans_type, tu.order_info, 
+					4 buy_type, oa.order_add_code order_code, oa.add_amount order_amount,
+					oa.pay_status, 0 order_status, 0 wining_status, oa.add_status,
+					tu.cash_amount, tu.red_trans_amount,
+					oa.pre_bonus, oa.create_time, oa.create_time trans_time
+				<include refid="SQL_FROM_WHERE_FIND_ORDER_LIST_BY_PROXY_FOR_ADDORDER"></include>
+				ORDER BY oa.create_time DESC
+				<if test="endRow != null">
+					LIMIT #{endRow}
+				</if>
+			) t2
+			UNION ALL
+			SELECT * FROM (
+				SELECT tu.trans_code, tu.trans_type, concat(oi.lottery_name, '合买|', oi.lottery_issue, '期') order_info, 
+					oi.buy_type, oi.order_code, ogc.buy_amount, 
+					oi.pay_status, oi.order_status, oi.winning_status, 0 add_status,
+					tu.cash_amount, tu.red_trans_amount,
+					ogc.pre_bonus, ogc.create_time, oi.come_out_time trans_time
+				<include refid="SQL_FROM_WHERE_FIND_ORDER_LIST_BY_PROXY_FOR_GROUP"></include>
+				ORDER BY oi.come_out_time DESC 
+				<if test="endRow != null">
+					LIMIT #{endRow}
+				</if>
+			) t3
+		) tmp
+		ORDER BY tmp.trans_time DESC
+		<if test="startRow != null and pageSize != null">
+		LIMIT #{startRow}, #{pageSize}
+		</if>
+	</select>
+
+</mapper>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.commoncore.persistence.operate.dao.OperateLotteryInfoDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateLotteryInfoBO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="LOTTERY_ID" property="lotteryId" jdbcType="DECIMAL" />
+    <result column="TYPE_ID" property="typeId" jdbcType="INTEGER" />
+    <result column="ORDER_ID" property="orderId" jdbcType="SMALLINT" />
+    <result column="CATEGORY_ID" property="categoryId" jdbcType="SMALLINT" />
+    <result column="TYPE_ALIAS" property="typeAlias" jdbcType="VARCHAR" />
+    <result column="TYPE_URL" property="typeUrl" jdbcType="VARCHAR" />
+    <result column="DISPLAY" property="display" jdbcType="SMALLINT" />
+    <result column="OFFLINE_TIME" property="offlineTime" jdbcType="TIMESTAMP" />
+    <result column="ICON" property="icon" jdbcType="SMALLINT" />
+    <result column="TARGET" property="target" jdbcType="SMALLINT" />
+    <result column="TYPE_KEY" property="typeKey" jdbcType="VARCHAR" />
+    <result column="TYPE_KEY_URL" property="typeKeyUrl" jdbcType="VARCHAR" />
+    <result column="COLOR" property="color" jdbcType="VARCHAR" />
+    <result column="URL" property="url" jdbcType="VARCHAR" />    
+    <result column="LOTTERY_CHILD_CODE" property="lotteryChildCode" jdbcType="INTEGER" />    
+    <result column="LOTTERY_DESCRIBE" property="lotteryDescribe" jdbcType="VARCHAR" />    
+  </resultMap>
+  
+   <resultMap id="HomeResultDetailMap" type="com.hhly.skeleton.lotto.base.operate.bo.OperateLotteryDetailBO" >
+    <result column="LOTTERY_ID" property="lotteryId" jdbcType="DECIMAL" />
+    <result column="TYPE_ID" property="typeId" jdbcType="INTEGER" />
+    <result column="ORDER_ID" property="orderId" jdbcType="SMALLINT" />
+    <result column="CATEGORY_ID" property="categoryId" jdbcType="SMALLINT" />
+    <result column="TYPE_ALIAS" property="typeAlias" jdbcType="VARCHAR" />
+    <result column="TYPE_URL" property="typeUrl" jdbcType="VARCHAR" />
+    <result column="ICON" property="icon" jdbcType="SMALLINT" />
+    <result column="TARGET" property="target" jdbcType="SMALLINT" />
+    <result column="TYPE_KEY" property="typeKey" jdbcType="VARCHAR" />
+    <result column="TYPE_KEY_URL" property="typeKeyUrl" jdbcType="VARCHAR" />
+    <result column="LOTTERY_LOGO_URL" property="lotteryLogoUrl" jdbcType="VARCHAR" />
+    <result column="URL" property="operUrl" jdbcType="VARCHAR" />
+    <result column="COLOR" property="color" jdbcType="VARCHAR" />    
+    <result column="JACKPOT_AMOUNT" property="jackpotAmount" jdbcType="DECIMAL" />  
+    <result column="SALE_END_TIME" property="saleEndTime" jdbcType="TIMESTAMP" />    
+  </resultMap>
+
+  
+  <sql id="Base_Column_List" >
+    ID, LOTTERY_ID, TYPE_ID, ORDER_ID, CATEGORY_ID, TYPE_ALIAS, TYPE_URL, DISPLAY, OFFLINE_TIME, 
+    ICON, TARGET, TYPE_KEY, TYPE_KEY_URL,COLOR,URL,LOTTERY_CHILD_CODE,LOTTERY_DESCRIBE
+  </sql>
+  <sql id="Home_Column_List" >
+    id, ONLINE_TIME, OFFLINE_TIME, ONLINE_WEEK, OFFLINE_WEEK,TYPE_ID, ORDER_ID, CATEGORY_ID, TYPE_ALIAS, TYPE_URL,  
+    ICON, TARGET, TYPE_KEY, TYPE_KEY_URL,LOTTERY_LOGO_URL,URL,color<!-- ,JACKPOT_AMOUNT,SALE_END_TIME -->
+  </sql>
+  <sql id="Page_Condition">
+  	 <if test="startRow != null and pageSize != null">
+   		limit #{startRow},#{pageSize}
+ 	 </if>
+  </sql>
+  
+  <sql id="Query_Condition">
+  	<where>
+  		<if test="lotteryId != null">
+				LOTTERY_ID = #{lotteryId}
+  		</if>
+  		<if test="ids != null">
+  			and id in
+  			<foreach collection="ids" item="id" open="(" close=")" separator=",">
+  				#{id}
+  			</foreach>
+  		</if>
+		</where>
+  </sql>
+  
+  <sql id="Table">
+  	OPERATE_LOTTERY_INFO
+  </sql>
+  
+  <sql id="Home_Select_Sql">
+	(	select s.*,li.SALE_END_TIME,li.issue_code  from  (
+			select  JACKPOT_AMOUNT,lottery_code
+					        from 
+					       	lottery_issue li
+					        where 
+					        ISSUE_LASTEST =1
+			)s   left join lottery_issue li on  li.lottery_code = s.lottery_code  and li.CURRENT_ISSUE =1	         
+            
+    ) 
+    </sql> 
+  
+    
+  <resultMap type="com.hhly.skeleton.lotto.base.operate.bo.OperateLotteryBO" id="LottResultMap">
+	 	<result column="ID" property="id" jdbcType="INTEGER" />
+	 	<result column="ONLINE_TIME" property="onlineTime" jdbcType="VARCHAR" />
+	    <result column="OFFLINE_TIME" property="offlineTime" jdbcType="VARCHAR" />
+	    <result column="ONLINE_WEEK" property="onlineWeek" jdbcType="SMALLINT" />
+	    <result column="OFFLINE_WEEK" property="offlineWeek" jdbcType="SMALLINT" />   
+		<collection property="lotteryInfoList" column="id"  javaType="java.util.ArrayList" resultMap="LotteryInfoResultMap"/>
+  </resultMap>
+  <resultMap type="com.hhly.skeleton.lotto.base.operate.bo.OperateLotteryDetailBO" id="LotteryInfoResultMap">
+    <result column="LOTTERY_ID" property="lotteryId" jdbcType="DECIMAL" />
+    <result column="TYPE_ID" property="typeId" jdbcType="INTEGER" />
+    <result column="ORDER_ID" property="orderId" jdbcType="SMALLINT" />
+    <result column="CATEGORY_ID" property="categoryId" jdbcType="SMALLINT" />
+    <result column="TYPE_ALIAS" property="typeAlias" jdbcType="VARCHAR" />
+    <result column="TYPE_URL" property="typeUrl" jdbcType="VARCHAR" />
+    <result column="ICON" property="icon" jdbcType="SMALLINT" />
+    <result column="TARGET" property="target" jdbcType="SMALLINT" />
+    <result column="TYPE_KEY" property="typeKey" jdbcType="VARCHAR" />
+    <result column="TYPE_KEY_URL" property="typeKeyUrl" jdbcType="VARCHAR" />
+    <result column="LOTTERY_LOGO_URL" property="lotteryLogoUrl" jdbcType="VARCHAR" />
+    <result column="URL" property="operUrl" jdbcType="VARCHAR" />
+    <result column="COLOR" property="color" jdbcType="VARCHAR" />   
+    <result column="LOTT_OFFLINE_TIME" property="offlineTime" jdbcType="TIMESTAMP" />
+     <result column="lottery_child_code" property="lotteryChildCode" jdbcType="VARCHAR" />  
+            
+  </resultMap>
+    <select id="findPCHomeOperLottery" parameterType="com.hhly.skeleton.lotto.base.operate.bo.OperateLotteryBO" resultMap="LottResultMap">	 
+		SELECT
+			l.id,l.ONLINE_TIME,l.OFFLINE_TIME,l.ONLINE_WEEK,l.OFFLINE_WEEK,t.TYPE_ID,t.ORDER_ID,t.CATEGORY_ID,t.offline_time as LOTT_OFFLINE_TIME,
+			t.TYPE_ALIAS,t.TYPE_URL,t.ICON,t.TARGET,t.TYPE_KEY,t.TYPE_KEY_URL,t.URL,t.color,lt.LOTTERY_LOGO_URL,t.lottery_child_code 
+		FROM
+			operate_lottery_info t LEFT JOIN operate_lottery l ON t.lottery_id = l.id
+			LEFT JOIN lottery_type lt ON t.TYPE_ID = lt.LOTTERY_CODE
+		WHERE
+			l.PLATFORM =#{platform}   and l.isDefault=#{isDefault} and l. STATUS = 1 and t.DISPLAY!=0
+		ORDER BY 
+			l.id,t.order_id
+	 
+  </select>
+</mapper>
